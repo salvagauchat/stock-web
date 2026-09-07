@@ -1,0 +1,77 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Cobrar</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancelar()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <h2>Subtotal: ${{ subtotal.toFixed(2) }}</h2>
+
+  <ion-segment [value]="modo" (ionChange)="cambiarModo($any($event.detail.value))">
+    <ion-segment-button value="simple">
+      <ion-label>Un medio</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="mixto">
+      <ion-label>Mixto</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  @if (modo === 'simple') {
+    <div class="ion-margin-top">
+      @for (config of configs; track config.medio_pago) {
+        <ion-button
+          expand="block"
+          [fill]="medioSeleccionado === config.medio_pago ? 'solid' : 'outline'"
+          (click)="seleccionarSimple(config)"
+        >
+          {{ config.medio_pago }} ({{ config.descuento_porcentaje }}% desc. / {{ config.recargo_porcentaje }}% rec.)
+        </ion-button>
+      }
+
+      @if (medioSeleccionado === 'CREDITO') {
+        <ion-item>
+          <ion-label position="stacked">Cuotas</ion-label>
+          <ion-select [(ngModel)]="cuotas" name="cuotas" (ionChange)="onCuotasChange($any($event.detail.value))">
+            @for (opcion of cuotasOpciones; track opcion.cuotas) {
+              <ion-select-option [value]="opcion.cuotas">{{ opcion.cuotas }} cuotas ({{ opcion.recargo }}% recargo)</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+      }
+
+      @if (medioSeleccionado) {
+        <h3 class="ion-margin-top">Total a cobrar: ${{ totalSimple.toFixed(2) }}</h3>
+      }
+    </div>
+  } @else {
+    <div class="ion-margin-top">
+      @for (linea of lineasMixtas; track linea.medio_pago) {
+        <ion-item>
+          <ion-label position="stacked">
+            {{ linea.medio_pago }} ({{ linea.descuento_porcentaje }}% desc. / {{ linea.recargo_porcentaje }}% rec.)
+          </ion-label>
+          <ion-input type="number" [(ngModel)]="linea.monto_subtotal" [name]="linea.medio_pago"></ion-input>
+        </ion-item>
+        <ion-button fill="clear" size="small" (click)="asignarRestoA(linea)">Completar con el resto</ion-button>
+        <p>Cobra: ${{ totalLinea(linea).toFixed(2) }}</p>
+      }
+
+      <h3 class="ion-margin-top">
+        Repartido: ${{ sumaSubtotalMixto.toFixed(2) }} / ${{ subtotal.toFixed(2) }}
+        (falta: ${{ diferenciaMixto.toFixed(2) }})
+      </h3>
+      <h3>Total a cobrar: ${{ totalMixto.toFixed(2) }}</h3>
+    </div>
+  }
+
+  @if (error()) {
+    <ion-text color="danger">
+      <p>{{ error() }}</p>
+    </ion-text>
+  }
+
+  <ion-button expand="block" class="ion-margin-top" (click)="confirmar()">Confirmar cobro</ion-button>
+</ion-content>

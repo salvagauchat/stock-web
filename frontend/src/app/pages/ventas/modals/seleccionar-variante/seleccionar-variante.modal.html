@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ productoNombre }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancelar()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    @for (v of variantes; track v.id) {
+      <ion-item button (click)="elegir(v)">
+        <ion-label>
+          <h2>{{ etiqueta(v) }}</h2>
+          <p>Stock disponible: {{ v.stock_actual }}</p>
+        </ion-label>
+      </ion-item>
+    }
+  </ion-list>
+</ion-content>

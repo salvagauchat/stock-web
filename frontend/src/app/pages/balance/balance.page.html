@@ -1,0 +1,113 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title class="brand-title">Balance</ion-title>
+    <ion-buttons slot="end">
+      <ion-button class="logout-button" (click)="logout()">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-segment [value]="periodo" (ionChange)="setPeriodo($any($event.detail.value))">
+    <ion-segment-button value="hoy"><ion-label>Hoy</ion-label></ion-segment-button>
+    <ion-segment-button value="semana"><ion-label>Semana</ion-label></ion-segment-button>
+    <ion-segment-button value="mes"><ion-label>Mes</ion-label></ion-segment-button>
+    <ion-segment-button value="anio"><ion-label>Año</ion-label></ion-segment-button>
+    <ion-segment-button value="personalizado"><ion-label>Personalizado</ion-label></ion-segment-button>
+  </ion-segment>
+
+  <div class="ion-margin-top" style="display:flex; gap:12px; flex-wrap:wrap;">
+    <ion-item style="flex:1; min-width:150px;">
+      <ion-label position="stacked">Desde</ion-label>
+      <ion-input type="date" [(ngModel)]="desde" (ionChange)="fechaPersonalizadaCambio()"></ion-input>
+    </ion-item>
+    <ion-item style="flex:1; min-width:150px;">
+      <ion-label position="stacked">Hasta</ion-label>
+      <ion-input type="date" [(ngModel)]="hasta" (ionChange)="fechaPersonalizadaCambio()"></ion-input>
+    </ion-item>
+  </div>
+
+  @if (balance) {
+    <hr class="balance-sep" />
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div>
+        <h3>Ingresos</h3>
+        <h1>${{ balance.ingresos }}</h1>
+      </div>
+      <div>
+        <h3>Egresos</h3>
+        <h1>${{ egresosTotales.toFixed(2) }}</h1>
+      </div>
+      <div>
+        <h3>Balance neto</h3>
+        <h1 [style.color]="balanceNeto >= 0 ? '#2dd36f' : '#eb445a'">${{ balanceNeto.toFixed(2) }}</h1>
+      </div>
+      <div>
+        <h3>Ganancia bruta</h3>
+        <h1>${{ balance.ganancia_bruta }} ({{ balance.margen_porcentaje }}%)</h1>
+      </div>
+    </div>
+
+    <p>Gastos corrientes: ${{ balance.gastos_corrientes }} · Gastos no corrientes: ${{ balance.gastos_no_corrientes }}</p>
+
+    <hr class="balance-sep" />
+
+    <h3>Evolución diaria</h3>
+    <div style="position: relative; height: 250px;">
+      <canvas #chartEvolucion></canvas>
+    </div>
+
+    <hr class="balance-sep" />
+
+    <h3>Ingresos por medio de pago</h3>
+    <div style="position: relative; height: 250px;">
+      <canvas #chartMedios></canvas>
+    </div>
+
+    <hr class="balance-sep" />
+
+    <h3>Por medio de pago</h3>
+    <div style="overflow-x:auto;">
+      <table class="balance-tabla">
+        <thead>
+          <tr>
+            <th style="text-align:left;">Medio</th>
+            <th style="text-align:right;">Ingresos</th>
+            <th style="text-align:right;">Egresos</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (medio of mediosPago; track medio.key) {
+            <tr>
+              <td>{{ medio.label }}</td>
+              <td style="text-align:right;">${{ balance.ingresos_por_medio[medio.key] }}</td>
+              <td style="text-align:right;">${{ balance.egresos_por_medio[medio.key] }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="balance-sep" />
+
+    <h3>Top 5 categorías más vendidas</h3>
+    <ion-list lines="full">
+      @for (c of balance.top_categorias; track c.categoria) {
+        <ion-item>
+          <ion-label>{{ c.categoria }}</ion-label>
+          <ion-label slot="end">{{ c.unidades_vendidas }} u. · ${{ c.total_facturado }}</ion-label>
+        </ion-item>
+      } @empty {
+        <ion-item>
+          <ion-label>No hay ventas en este período.</ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
+</ion-content>

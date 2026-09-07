@@ -1,0 +1,20 @@
+.balance-sep {
+  border: none;
+  border-top: 1px solid var(--ion-color-step-200, #d7d8da);
+  margin: 24px 0;
+}
+
+.balance-tabla {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 8px;
+    border-bottom: 1px solid var(--ion-color-step-150, #e3e4e6);
+  }
+
+  th {
+    border-bottom-width: 2px;
+  }
+}

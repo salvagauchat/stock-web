@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Venta #{{ venta.id }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <p>{{ venta.fecha | date: 'dd/MM/yyyy HH:mm' }}</p>
+
+  <ion-list>
+    @for (d of venta.detalles; track d.id) {
+      <ion-item>
+        <ion-label>
+          {{ d.cantidad }} x {{ d.producto_nombre }}{{ etiquetaVariante(d) }}
+        </ion-label>
+        <ion-label slot="end">${{ d.subtotal }}</ion-label>
+      </ion-item>
+    }
+  </ion-list>
+
+  <h2 class="ion-margin-top">Subtotal: ${{ venta.subtotal }}</h2>
+  <h2>Descuento: ${{ venta.descuento }}</h2>
+  <h1>Total: ${{ venta.total }}</h1>
+
+  <h3 class="ion-margin-top">Pagos</h3>
+  <ion-list>
+    @for (p of venta.pagos; track p.id) {
+      <ion-item>
+        <ion-label>{{ p.medio_pago }} @if (p.cuotas) { ({{ p.cuotas }} cuotas) }</ion-label>
+        <ion-label slot="end">${{ p.monto }}</ion-label>
+      </ion-item>
+    }
+  </ion-list>
+
+  <ion-button expand="block" class="ion-margin-top" (click)="cerrar()">Cerrar</ion-button>
+</ion-content>

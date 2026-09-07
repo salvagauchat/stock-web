@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Categorías de gasto</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <h3>Corrientes</h3>
+  <ion-list>
+    @for (c of categoriasCorrientes; track c.id) {
+      <ion-item>
+        <ion-label>{{ c.nombre }}</ion-label>
+      </ion-item>
+    }
+  </ion-list>
+
+  <h3>No corrientes</h3>
+  <ion-list>
+    @for (c of categoriasNoCorrientes; track c.id) {
+      <ion-item>
+        <ion-label>{{ c.nombre }}</ion-label>
+      </ion-item>
+    }
+  </ion-list>
+
+  <h3 class="ion-margin-top">Agregar categoría</h3>
+  <ion-item>
+    <ion-label position="stacked">Nombre</ion-label>
+    <ion-input [(ngModel)]="nombre" name="nombre"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-label position="stacked">Tipo</ion-label>
+    <ion-select [(ngModel)]="tipo" name="tipo">
+      <ion-select-option value="CORRIENTE">Corriente</ion-select-option>
+      <ion-select-option value="NO_CORRIENTE">No corriente</ion-select-option>
+    </ion-select>
+  </ion-item>
+  <ion-item>
+    <ion-label position="stacked">Descripción</ion-label>
+    <ion-input [(ngModel)]="descripcion" name="descripcion"></ion-input>
+  </ion-item>
+
+  @if (error()) {
+    <ion-text color="danger">
+      <p>{{ error() }}</p>
+    </ion-text>
+  }
+
+  <ion-button expand="block" class="ion-margin-top" (click)="agregar()">+ Agregar categoría</ion-button>
+</ion-content>

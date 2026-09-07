@@ -1,0 +1,35 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ esEdicion ? 'Editar categoría' : 'Nueva categoría' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancelar()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-label position="stacked">Nombre</ion-label>
+    <ion-input [(ngModel)]="nombre" name="nombre" required></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Descripción</ion-label>
+    <ion-input [(ngModel)]="descripcion" name="descripcion"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Ícono (opcional)</ion-label>
+    <ion-input [(ngModel)]="icono" name="icono"></ion-input>
+  </ion-item>
+
+  @if (error()) {
+    <ion-text color="danger">
+      <p>{{ error() }}</p>
+    </ion-text>
+  }
+
+  <ion-button expand="block" class="ion-margin-top" (click)="guardar()" [disabled]="guardando()">
+    {{ guardando() ? 'Guardando...' : 'Guardar' }}
+  </ion-button>
+</ion-content>

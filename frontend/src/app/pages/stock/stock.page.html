@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title class="brand-title">Stock</ion-title>
+    <ion-buttons slot="end">
+      <ion-button class="logout-button" (click)="logout()">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar [(ngModel)]="busqueda" (ionInput)="aplicarFiltro()" placeholder="Buscar por nombre, marca o ID"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    @for (producto of productosFiltrados; track producto.id) {
+      <ion-item>
+        <ion-label>
+          <h2>#{{ producto.id }} · {{ producto.nombre }}</h2>
+          <p>
+            {{ producto.categoria_nombre || 'Sin categoría' }}
+            @if (producto.proveedor_nombre) {
+              · {{ producto.proveedor_nombre }}
+            }
+          </p>
+        </ion-label>
+        <ion-badge
+          slot="end"
+          [color]="producto.stock_total === 0 ? 'danger' : producto.stock_total < 5 ? 'warning' : 'success'"
+        >
+          Stock: {{ producto.stock_total }}
+        </ion-badge>
+        <ion-button slot="end" fill="clear" (click)="abrirVariantes(producto)">Variantes</ion-button>
+        <ion-button slot="end" fill="clear" (click)="abrirEditar(producto)">Editar</ion-button>
+        <ion-button slot="end" fill="clear" color="danger" (click)="confirmarEliminar(producto)">Eliminar</ion-button>
+      </ion-item>
+    } @empty {
+      <ion-item>
+        <ion-label>No hay productos cargados todavía.</ion-label>
+      </ion-item>
+    }
+  </ion-list>
+
+  <ion-button expand="block" class="ion-margin" (click)="abrirNuevo()">+ Nuevo producto</ion-button>
+</ion-content>

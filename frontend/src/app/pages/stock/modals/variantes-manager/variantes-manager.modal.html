@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Variantes — {{ productoNombre }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list>
+    @for (v of variantes; track v.id) {
+      <ion-item>
+        <ion-label>
+          <h2>{{ etiqueta(v) }}</h2>
+          <p>Mínimo: {{ v.stock_minimo }} @if (v.sku) { · SKU: {{ v.sku }} }</p>
+        </ion-label>
+        <ion-badge slot="end" [color]="badgeColor(v)">{{ v.stock_actual }}</ion-badge>
+      </ion-item>
+      <div class="ion-padding-bottom" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+        <ion-button size="small" fill="outline" (click)="ajustarStock(v)">Ajustar stock</ion-button>
+        <ion-button size="small" fill="outline" (click)="editarMinimo(v)">Editar mínimo</ion-button>
+        <ion-button size="small" fill="outline" color="danger" (click)="eliminar(v)">Eliminar</ion-button>
+      </div>
+    } @empty {
+      <ion-item>
+        <ion-label>Este producto todavía no tiene variantes.</ion-label>
+      </ion-item>
+    }
+  </ion-list>
+
+  <h3>Agregar variante</h3>
+  <ion-item>
+    <ion-label position="stacked">Talle</ion-label>
+    <ion-input [(ngModel)]="nuevoTalle" name="nuevoTalle"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-label position="stacked">Color</ion-label>
+    <ion-input [(ngModel)]="nuevoColor" name="nuevoColor"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-label position="stacked">SKU (opcional)</ion-label>
+    <ion-input [(ngModel)]="nuevoSku" name="nuevoSku"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-label position="stacked">Stock inicial</ion-label>
+    <ion-input type="number" [(ngModel)]="nuevoStockInicial" name="nuevoStockInicial"></ion-input>
+  </ion-item>
+
+  @if (error()) {
+    <ion-text color="danger">
+      <p>{{ error() }}</p>
+    </ion-text>
+  }
+
+  <ion-button expand="block" class="ion-margin-top" (click)="agregar()">+ Agregar variante</ion-button>
+</ion-content>

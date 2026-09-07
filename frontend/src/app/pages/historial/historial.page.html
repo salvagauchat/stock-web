@@ -1,0 +1,27 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/ventas"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Historial de ventas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    @for (venta of ventas; track venta.id) {
+      <ion-item button (click)="abrirDetalle(venta)">
+        <ion-label>
+          <h2>Venta #{{ venta.id }}</h2>
+          <p>{{ venta.fecha | date: 'dd/MM/yyyy HH:mm' }} @if (venta.cliente) { · {{ venta.cliente }} }</p>
+        </ion-label>
+        <ion-badge slot="end" [color]="colorEstado(venta.estado)">{{ venta.estado }}</ion-badge>
+        <ion-label slot="end">${{ venta.total }}</ion-label>
+      </ion-item>
+    } @empty {
+      <ion-item>
+        <ion-label>Todavía no hay ventas registradas.</ion-label>
+      </ion-item>
+    }
+  </ion-list>
+</ion-content>

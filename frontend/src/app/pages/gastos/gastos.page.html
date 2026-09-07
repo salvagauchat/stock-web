@@ -1,0 +1,64 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title class="brand-title">Gastos</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="abrirCategorias()">Categorías de gasto</ion-button>
+      <ion-button class="logout-button" (click)="logout()">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-label position="stacked">Desde</ion-label>
+    <ion-input type="date" [(ngModel)]="desde" (ionChange)="cargar()"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-label position="stacked">Hasta</ion-label>
+    <ion-input type="date" [(ngModel)]="hasta" (ionChange)="cargar()"></ion-input>
+  </ion-item>
+
+  <div class="ion-margin-vertical" style="display:flex; gap:8px; flex-wrap:wrap;">
+    <ion-button size="small" fill="outline" (click)="setearRangoRapido('hoy')">Hoy</ion-button>
+    <ion-button size="small" fill="outline" (click)="setearRangoRapido('semana')">Última semana</ion-button>
+    <ion-button size="small" fill="outline" (click)="setearRangoRapido('mes')">Este mes</ion-button>
+    <ion-button size="small" fill="outline" (click)="setearRangoRapido('anio')">Este año</ion-button>
+  </div>
+
+  <ion-segment [value]="filtroTipo" (ionChange)="cambiarFiltroTipo($any($event.detail.value))">
+    <ion-segment-button value="TODOS"><ion-label>Todos</ion-label></ion-segment-button>
+    <ion-segment-button value="CORRIENTE"><ion-label>Corrientes</ion-label></ion-segment-button>
+    <ion-segment-button value="NO_CORRIENTE"><ion-label>No corrientes</ion-label></ion-segment-button>
+  </ion-segment>
+
+  <h2 class="ion-margin-top">Corriente: ${{ totalCorriente.toFixed(2) }}</h2>
+  <h2>No corriente: ${{ totalNoCorriente.toFixed(2) }}</h2>
+  <h1>Total: ${{ totalGeneral.toFixed(2) }}</h1>
+
+  <ion-list class="ion-margin-top">
+    @for (gasto of gastosFiltrados; track gasto.id) {
+      <ion-item>
+        <ion-label>
+          <h2>{{ gasto.descripcion }}</h2>
+          <p>{{ gasto.categoria_nombre }} · {{ gasto.medio_pago }}</p>
+        </ion-label>
+        <ion-badge slot="end" [color]="gasto.categoria_tipo === 'NO_CORRIENTE' ? 'tertiary' : 'primary'">
+          ${{ gasto.monto }}
+        </ion-badge>
+        <ion-button slot="end" fill="clear" (click)="abrirEditar(gasto)">Editar</ion-button>
+        <ion-button slot="end" fill="clear" color="danger" (click)="confirmarEliminar(gasto)">Eliminar</ion-button>
+      </ion-item>
+    } @empty {
+      <ion-item>
+        <ion-label>No hay gastos en este rango.</ion-label>
+      </ion-item>
+    }
+  </ion-list>
+
+  <ion-button expand="block" (click)="abrirNuevo()">+ Nuevo gasto</ion-button>
+</ion-content>

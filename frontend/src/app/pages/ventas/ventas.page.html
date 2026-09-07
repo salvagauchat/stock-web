@@ -1,0 +1,58 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title class="brand-title">Ventas</ion-title>
+    <ion-buttons slot="end">
+      <ion-button class="logout-button" (click)="logout()">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar [(ngModel)]="busqueda" (ionInput)="aplicarFiltro()" placeholder="Buscar por nombre, marca o ID"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    @for (producto of productosFiltrados; track producto.id) {
+      <ion-item button [class.en-carrito]="estaEnCarrito(producto.id)" (click)="seleccionarProducto(producto)">
+        <ion-label>
+          <h2>#{{ producto.id }} · {{ producto.nombre }}</h2>
+          <p>${{ producto.precio_venta }} · Stock: {{ producto.stock_total }}</p>
+        </ion-label>
+      </ion-item>
+    } @empty {
+      <ion-item>
+        <ion-label>No hay productos con stock disponible.</ion-label>
+      </ion-item>
+    }
+  </ion-list>
+
+  @if (carrito.length > 0) {
+    <h3 class="ion-padding-start ion-margin-top">Carrito</h3>
+    <ion-list>
+      @for (item of carrito; track item.varianteId) {
+        <ion-item>
+          <ion-label>
+            <h3>{{ item.productoNombre }} ({{ item.etiquetaVariante }})</h3>
+            <p>${{ item.precioUnitario }} c/u</p>
+          </ion-label>
+          <ion-button slot="end" fill="clear" (click)="decrementar(item)">-</ion-button>
+          <ion-label slot="end">{{ item.cantidad }}</ion-label>
+          <ion-button slot="end" fill="clear" (click)="incrementar(item)">+</ion-button>
+          <ion-badge slot="end">${{ (item.cantidad * item.precioUnitario).toFixed(2) }}</ion-badge>
+        </ion-item>
+      }
+    </ion-list>
+
+    <div class="ion-padding">
+      <h2>Subtotal: ${{ subtotal.toFixed(2) }}</h2>
+      <ion-button expand="block" (click)="cobrar()" [disabled]="procesando()">
+        {{ procesando() ? 'Procesando...' : 'Cobrar' }}
+      </ion-button>
+    </div>
+  }
+</ion-content>

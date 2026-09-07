@@ -1,0 +1,68 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ esEdicion ? 'Editar gasto' : 'Nuevo gasto' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancelar()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-label position="stacked">Categoría</ion-label>
+    <ion-select [(ngModel)]="categoriaGastoId" name="categoria" interface="popover">
+      @for (cat of categorias; track cat.id) {
+        <ion-select-option [value]="cat.id">{{ cat.nombre }} ({{ cat.tipo === 'CORRIENTE' ? 'corriente' : 'no corriente' }})</ion-select-option>
+      }
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Descripción</ion-label>
+    <ion-input [(ngModel)]="descripcion" name="descripcion" required></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Monto</ion-label>
+    <ion-input type="number" [(ngModel)]="monto" name="monto"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Medio de pago</ion-label>
+    <ion-select [(ngModel)]="medioPago" name="medioPago" interface="popover">
+      @for (medio of mediosPago; track medio) {
+        <ion-select-option [value]="medio">{{ medio }}</ion-select-option>
+      }
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Proveedor (opcional)</ion-label>
+    <ion-select [(ngModel)]="proveedorId" name="proveedor" interface="popover">
+      <ion-select-option [value]="null">Sin proveedor</ion-select-option>
+      @for (prov of proveedores; track prov.id) {
+        <ion-select-option [value]="prov.id">{{ prov.nombre }}</ion-select-option>
+      }
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">N° de comprobante</ion-label>
+    <ion-input [(ngModel)]="comprobanteNumero" name="comprobanteNumero"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Notas</ion-label>
+    <ion-input [(ngModel)]="notas" name="notas"></ion-input>
+  </ion-item>
+
+  @if (error()) {
+    <ion-text color="danger">
+      <p>{{ error() }}</p>
+    </ion-text>
+  }
+
+  <ion-button expand="block" class="ion-margin-top" (click)="guardar()" [disabled]="guardando()">
+    {{ guardando() ? 'Guardando...' : 'Guardar' }}
+  </ion-button>
+</ion-content>

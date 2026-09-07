@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/stock"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Proveedores</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    @for (proveedor of proveedores; track proveedor.id) {
+      <ion-item>
+        <ion-label>
+          <h2>{{ proveedor.nombre }}</h2>
+          @if (proveedor.telefono || proveedor.email) {
+            <p>{{ proveedor.telefono }} {{ proveedor.telefono && proveedor.email ? '·' : '' }} {{ proveedor.email }}</p>
+          }
+        </ion-label>
+        <ion-button slot="end" fill="clear" (click)="abrirEditar(proveedor)">Editar</ion-button>
+        <ion-button slot="end" fill="clear" color="danger" (click)="confirmarEliminar(proveedor)">Eliminar</ion-button>
+      </ion-item>
+    } @empty {
+      <ion-item>
+        <ion-label>No hay proveedores cargados todavía.</ion-label>
+      </ion-item>
+    }
+  </ion-list>
+
+  <ion-button expand="block" class="ion-margin" (click)="abrirNuevo()">+ Nuevo proveedor</ion-button>
+</ion-content>

@@ -1,0 +1,35 @@
+/* Ionic usa --ion-background-color como fallback interno en varios
+   componentes (ion-content, ion-list, el contenido del accordion, etc.).
+   Pisando esta variable a nivel ion-menu, se hereda hacia todos los
+   componentes hijos (incluso los que tienen shadow DOM), así que no hace
+   falta forzar el fondo de cada uno por separado. */
+ion-menu {
+  --ion-background-color: #1e40af;
+  --ion-item-background: transparent;
+  --background: #1e40af;
+}
+
+ion-menu ion-toolbar {
+  --background: #1e40af;
+  --color: #ffffff;
+}
+
+ion-menu ion-content {
+  --background: #1e40af;
+  --color: #ffffff;
+}
+
+ion-menu ion-item {
+  --color: #ffffff;
+  --border-color: rgba(255, 255, 255, 0.15);
+}
+
+ion-menu ion-title.brand-title {
+  color: #ffffff;
+}
+
+ion-menu .menu-activo {
+  --background: rgba(255, 255, 255, 0.18);
+  --color: #ffffff;
+  font-weight: 600;
+}

@@ -1,0 +1,47 @@
+/* Core CSS requerido para que los componentes de Ionic se vean bien */
+@import "@ionic/angular/css/core.css";
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Utilidades opcionales de Ionic */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/* Saca la sombra/borde que Ionic pone por defecto debajo del header */
+ion-header {
+  box-shadow: none;
+}
+ion-header::after {
+  display: none !important;
+  background-image: none !important;
+}
+
+/* Marca de la app: usado en el título de cada pantalla principal */
+.brand-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  text-align: left;
+}
+
+/* Botón de salir: ícono blanco con fondo rojo, arriba a la derecha en cada pantalla principal */
+.logout-button {
+  --background: var(--ion-color-danger);
+  --background-hover: var(--ion-color-danger-shade);
+  --color: white;
+  --border-radius: 50%;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  margin-inline-end: 4px;
+}
+
+/* Resalta el ítem activo del menú lateral */
+.menu-activo {
+  --background: var(--ion-color-light);
+  --color: var(--ion-color-primary);
+  font-weight: 600;
+}

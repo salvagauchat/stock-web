@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/stock"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Categorías</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    @for (categoria of categorias; track categoria.id) {
+      <ion-item>
+        <ion-label>
+          <h2>{{ categoria.nombre }}</h2>
+          @if (categoria.descripcion) {
+            <p>{{ categoria.descripcion }}</p>
+          }
+        </ion-label>
+        <ion-button slot="end" fill="clear" (click)="abrirEditar(categoria)">Editar</ion-button>
+        <ion-button slot="end" fill="clear" color="danger" (click)="confirmarEliminar(categoria)">Eliminar</ion-button>
+      </ion-item>
+    } @empty {
+      <ion-item>
+        <ion-label>No hay categorías cargadas todavía.</ion-label>
+      </ion-item>
+    }
+  </ion-list>
+
+  <ion-button expand="block" class="ion-margin" (click)="abrirNueva()">+ Nueva categoría</ion-button>
+</ion-content>
