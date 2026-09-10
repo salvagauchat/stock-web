@@ -51,14 +51,19 @@ backend/app/
                                  # salvo auth.py
 
 frontend/src/app/
-├── app.ts / app.html / app.scss    # Shell de la app: ion-split-pane + ion-menu (menú lateral) +
-│                                    # ion-router-outlet. El menú solo se muestra si auth.autenticado()
+├── app.ts / app.html / app.scss    # Shell de la app: sidebar propio (custom, no ion-menu) +
+│                                    # ion-router-outlet, visible solo si auth.autenticado()
 ├── app.routes.ts                   # Rutas lazy (loadComponent), todas con canActivate: [authGuard]
 ├── core/
 │   ├── services/                   # Un service por recurso, HttpClient contra la API
 │   ├── guards/auth.guard.ts        # Bloquea rutas sin token
 │   └── interceptors/auth.interceptor.ts  # Agrega Authorization: Bearer <token>; en 401 desloguea
 ├── models/                         # Interfaces TS que reflejan el JSON del backend
+├── shared/                         # Cosas reusadas entre pantallas: pipes/money.pipe.ts (formato
+│                                    # "$ 18.900"), presentacion.ts (color por categoría, swatch de
+│                                    # color de variante, etiqueta talle/color), y
+│                                    # modals/confirm-dialog/ (diálogo de confirmación genérico que
+│                                    # reemplaza AlertController.create() en toda la app)
 └── pages/                          # Una carpeta por pantalla principal (ventas, stock, historial,
                                      # categorias, proveedores, gastos, balance, login), cada una con
                                      # sus modales en pages/<x>/modals/<modal>/
@@ -72,7 +77,7 @@ Tablas (todas con migraciones incrementales en `backend/alembic/versions/`, sin 
 - `categoria`, `proveedor` — catálogo de producto, soft delete (`activo`)
 - `producto` + `variante_producto` (talle/color, cada una con su `stock_actual`) + `movimiento_stock` (auditoría; `ajustar_stock()` en `crud/productos.py` es el único camino permitido para cambiar `stock_actual`, siempre en una transacción)
 - `venta` + `detalle_venta` + `pago_venta` + `config_medio_pago` (sembrada con los defaults de la app vieja: efectivo 20% desc., transferencia 15% desc., débito/crédito 0%)
-- `categoria_gasto` + `gasto` — `gasto` es la única entidad con **hard delete** (las demás son soft delete vía `activo`)
+- `categoria_gasto` + `gasto` — `gasto` es la única entidad con **hard delete** (las demás, incluida `categoria_gasto`, son soft delete vía `activo`)
 
 ## Reglas de negocio críticas (replicadas de `apk-stock`, no romper)
 
@@ -83,6 +88,16 @@ Tablas (todas con migraciones incrementales en `backend/alembic/versions/`, sin 
 5. **Soft delete** (`activo=false`) en categoría, proveedor, producto, variante — **excepto `gasto`**, que se borra físicamente (no tiene histórico que dependa de él).
 6. **Rate limit de login**: 5 intentos fallidos → bloqueo 15 minutos, **por email, no por IP** (para no dejar afuera a todo el local si comparten conexión). Vive en memoria del proceso (`rate_limit.py`) — si el backend escala a más de una instancia, hay que pasarlo a un store compartido.
 7. **JWT en `localStorage`** (no cookie httpOnly) — decisión consciente por simplicidad, la app es interna y sin datos de tarjetas.
+
+## Diseño de UI — sistema "Nocturne"
+
+El frontend se migró de la UI celeste/blanca por defecto de Ionic a un diseño propio oscuro ("Nocturne": fondo `#161826`, acento blurple `#9184d9` usado como borde/glow, nunca como relleno grande), a partir de un handoff de diseño con mockups pantalla por pantalla. Ya está aplicado en **todas** las pantallas principales y sus modales, excepto **Historial** (listado + modal de detalle de venta, salvo el diálogo de "Anular venta" que sí se migró), que sigue con el estilo viejo de Ionic porque el handoff no la cubría.
+
+- **Tokens y clases reusables**: `frontend/src/nocturne-tokens.scss` (importado desde `styles.scss`, global). Variables CSS `--sl-*` (colores, radios, sombras, spacing) y clases `.sl-btn`/`.sl-input`/`.sl-field`/`.sl-seg`/`.sl-tag`/`.sl-card`/`.sl-table`/`.sl-dialog-*`. Antes de armar una pantalla nueva, revisar ahí si ya existe la clase que hace falta en vez de escribir CSS a mano.
+- **Iconos**: Phosphor Icons (`@phosphor-icons/web`, clase `ph ph-<nombre>`) — no `ionicons`.
+- **Modales**: siguen usando `ModalController` de Ionic (no se reemplazó esa arquitectura), pero estilizados para verse como diálogo Nocturne pasando `cssClass: ['sl-dialog-modal', 'sl-dialog-modal--<variante>']` al `.create()` (los anchos por variante están en `nocturne-tokens.scss`). El contenido interno usa `.sl-dialog-content`/`.sl-dialog-title`/`.sl-dialog-actions`, no `ion-header`/`ion-content`.
+- **Confirmaciones y "eliminar"**: usar `ConfirmDialogModal` (`shared/modals/confirm-dialog/`), nunca `AlertController.create()` — este último no se puede restylear para que combine con el resto de la app. Soporta pedir un motivo de texto (obligatorio u opcional), usado por ejemplo en "Anular venta".
+- **Helpers compartidos**: `shared/pipes/money.pipe.ts` (formato `$ 18.900`) y `shared/presentacion.ts` (color de miniatura por categoría, swatch de color de variante, etiqueta talle/color) — usarlos en vez de reimplementar el formateo en cada página nueva.
 
 ## Comandos importantes
 
@@ -110,7 +125,7 @@ ng build          # build de producción, usa environment.prod.ts vía fileRepla
 
 ## Estado del proyecto
 
-Módulos completos y verificados end-to-end (backend probado con `curl`, frontend probado en el navegador): **login** (con rate limit), **stock** (productos + variantes talle/color + categorías + proveedores), **ventas** (carrito, cobro simple/mixto, historial, anulación), **gastos** (con categorías corriente/no-corriente), **balance** (dashboard con gráficos, top de categorías más vendidas, tabla por medio de pago). Navegación por menú lateral, marca "StockLocal" en tipografía Poppins.
+Módulos completos y verificados end-to-end (backend probado con `curl`, frontend probado en el navegador): **login** (con rate limit), **stock** (productos + variantes talle/color + categorías + proveedores), **ventas** (carrito, cobro simple/mixto, historial, anulación), **gastos** (con categorías corriente/no-corriente), **balance** (dashboard con gráficos, top de categorías más vendidas, tabla por medio de pago). Navegación por sidebar. UI en el diseño "Nocturne" (ver sección de Diseño de UI más arriba) salvo Historial, todavía sin migrar.
 
 **Todavía no desplegado a producción** — corre todo local (backend en `localhost:8000`, Postgres real pendiente de Neon, frontend pendiente de Vercel).
 
