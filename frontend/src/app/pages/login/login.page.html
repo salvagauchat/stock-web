@@ -1,29 +1,78 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Stock Local</ion-title>
-  </ion-toolbar>
-</ion-header>
+<section class="marketing">
+  <div class="marketing-glow"></div>
+  <div class="marketing-rule"></div>
 
-<ion-content class="ion-padding">
-  <form (ngSubmit)="ingresar()">
-    <ion-item>
-      <ion-label position="stacked">Email</ion-label>
-      <ion-input type="email" [(ngModel)]="email" name="email" required autocomplete="username"></ion-input>
-    </ion-item>
+  <div class="brand">
+    <div class="brand-mark"><i class="ph ph-coat-hanger"></i></div>
+    <span class="brand-name">StockLocal</span>
+  </div>
 
-    <ion-item>
-      <ion-label position="stacked">Contraseña</ion-label>
-      <ion-input type="password" [(ngModel)]="password" name="password" required autocomplete="current-password"></ion-input>
-    </ion-item>
+  <div class="headline">
+    <div class="headline-mark"></div>
+    <h1>El local,<br />en una pantalla.</h1>
+    <p>Ventas con talle y color, stock por variante, gastos y balance. Lo mismo que la tablet, ahora en la web.</p>
+  </div>
+
+  <div class="stats">
+    <div><strong>20%</strong>descuento en efectivo</div>
+    <div><strong>15%</strong>descuento en transferencia</div>
+  </div>
+</section>
+
+<section class="form-side">
+  <form class="form-box" (ngSubmit)="ingresar()">
+    <h2>Iniciar sesión</h2>
+    <p class="form-subtitle">Cuenta interna del local. No hay registro público.</p>
+
+    <div class="sl-field">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        class="sl-input"
+        type="email"
+        [(ngModel)]="email"
+        name="email"
+        required
+        autocomplete="username"
+      />
+    </div>
+
+    <div class="sl-field">
+      <label for="password">Contraseña</label>
+      <div class="password-wrap">
+        <input
+          id="password"
+          class="sl-input"
+          [type]="mostrarPassword() ? 'text' : 'password'"
+          [(ngModel)]="password"
+          name="password"
+          required
+          autocomplete="current-password"
+        />
+        <button
+          type="button"
+          class="eye-toggle"
+          (click)="mostrarPassword.set(!mostrarPassword())"
+          [attr.aria-label]="mostrarPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+        >
+          <i class="ph" [class.ph-eye]="!mostrarPassword()" [class.ph-eye-slash]="mostrarPassword()"></i>
+        </button>
+      </div>
+    </div>
 
     @if (error()) {
-      <ion-text color="danger">
-        <p>{{ error() }}</p>
-      </ion-text>
+      <p class="form-error">{{ error() }}</p>
     }
 
-    <ion-button expand="block" type="submit" class="ion-margin-top" [disabled]="cargando()">
+    <button class="sl-btn sl-btn-primary sl-btn-block submit-btn" type="submit" [disabled]="cargando()">
       {{ cargando() ? 'Ingresando...' : 'Ingresar' }}
-    </ion-button>
+    </button>
+
+    <div class="rate-limit-note">
+      <i class="ph ph-shield-check"></i>
+      <span>Tras 5 intentos fallidos la cuenta se bloquea 15 minutos.</span>
+    </div>
+
+    <p class="footnote">StockLocal web</p>
   </form>
-</ion-content>
+</section>

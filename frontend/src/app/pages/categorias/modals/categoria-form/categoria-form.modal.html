@@ -1,35 +1,30 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>{{ esEdicion ? 'Editar categoría' : 'Nueva categoría' }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="cancelar()">Cerrar</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<div class="sl-dialog-content">
+  <div class="sl-dialog-title">{{ esEdicion ? 'Editar categoría' : 'Nueva categoría' }}</div>
 
-<ion-content class="ion-padding">
-  <ion-item>
-    <ion-label position="stacked">Nombre</ion-label>
-    <ion-input [(ngModel)]="nombre" name="nombre" required></ion-input>
-  </ion-item>
+  <div class="sl-field">
+    <label for="nombre">Nombre</label>
+    <input id="nombre" class="sl-input" [(ngModel)]="nombre" name="nombre" required />
+  </div>
 
-  <ion-item>
-    <ion-label position="stacked">Descripción</ion-label>
-    <ion-input [(ngModel)]="descripcion" name="descripcion"></ion-input>
-  </ion-item>
+  <div class="sl-field">
+    <label for="descripcion">Descripción</label>
+    <input id="descripcion" class="sl-input" [(ngModel)]="descripcion" name="descripcion" />
+  </div>
 
-  <ion-item>
-    <ion-label position="stacked">Ícono (opcional)</ion-label>
-    <ion-input [(ngModel)]="icono" name="icono"></ion-input>
-  </ion-item>
+  <div class="sl-field">
+    <label for="icono">Ícono (opcional)</label>
+    <input id="icono" class="sl-input" [(ngModel)]="icono" name="icono" placeholder="ph-t-shirt" />
+    <p class="sl-field-hint">Nombre de un ícono de Phosphor (phosphoricons.com), sin el prefijo "ph". Ej: ph-t-shirt, ph-coat-hanger.</p>
+  </div>
 
   @if (error()) {
-    <ion-text color="danger">
-      <p>{{ error() }}</p>
-    </ion-text>
+    <p class="sl-form-error">{{ error() }}</p>
   }
 
-  <ion-button expand="block" class="ion-margin-top" (click)="guardar()" [disabled]="guardando()">
-    {{ guardando() ? 'Guardando...' : 'Guardar' }}
-  </ion-button>
-</ion-content>
+  <div class="sl-dialog-actions">
+    <button class="sl-btn sl-btn-secondary" type="button" (click)="cancelar()">Cancelar</button>
+    <button class="sl-btn sl-btn-primary" type="button" [disabled]="guardando()" (click)="guardar()">
+      {{ guardando() ? 'Guardando...' : 'Guardar' }}
+    </button>
+  </div>
+</div>

@@ -1,45 +1,52 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
-import {
-  IonAccordion,
-  IonAccordionGroup,
-  IonApp,
-  IonContent,
-  IonHeader,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonMenu,
-  IonRouterOutlet,
-  IonSplitPane,
-  IonTitle,
-  IonToolbar,
-} from '@ionic/angular/standalone';
+import { Component, OnInit, computed, signal } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+import { filter } from 'rxjs';
 import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    RouterLink,
-    RouterLinkActive,
-    IonAccordion,
-    IonAccordionGroup,
-    IonApp,
-    IonContent,
-    IonHeader,
-    IonItem,
-    IonLabel,
-    IonList,
-    IonMenu,
-    IonRouterOutlet,
-    IonSplitPane,
-    IonTitle,
-    IonToolbar,
-  ],
+  imports: [RouterLink, RouterLinkActive, IonApp, IonRouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
-export class App {
-  constructor(public auth: AuthService) {}
+export class App implements OnInit {
+  private readonly urlActual = signal('');
+
+  readonly stockActivo = computed(() =>
+    ['/stock', '/categorias', '/proveedores'].some((p) => this.urlActual().startsWith(p)),
+  );
+
+  readonly iniciales = computed(() => {
+    const nombre = this.auth.usuario()?.nombre?.trim();
+    if (!nombre) {
+      return '';
+    }
+    return nombre
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((parte) => parte[0]?.toUpperCase())
+      .join('');
+  });
+
+  constructor(
+    public auth: AuthService,
+    private router: Router,
+  ) {
+    this.urlActual.set(this.router.url);
+    this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe((e) => {
+      this.urlActual.set((e as NavigationEnd).urlAfterRedirects);
+    });
+  }
+
+  ngOnInit() {
+    if (this.auth.autenticado()) {
+      this.auth.cargarUsuarioActual().subscribe();
+    }
+  }
+
+  logout() {
+    this.auth.logout();
+  }
 }

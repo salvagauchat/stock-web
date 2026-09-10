@@ -1,0 +1,32 @@
+.comprobante-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8.4px;
+  text-align: center;
+  padding: 26px;
+}
+
+.comprobante-check {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid var(--sl-accent);
+  display: grid;
+  place-items: center;
+  color: var(--sl-accent);
+  font-size: 24px;
+}
+
+.comprobante-total {
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.comprobante-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}

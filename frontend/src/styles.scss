@@ -1,3 +1,7 @@
+/* Tokens del rediseño "Nocturne" — ver design_handoff_stocklocal/README.md */
+@import "nocturne-tokens.scss";
+@import "@phosphor-icons/web/regular/style.css";
+
 /* Core CSS requerido para que los componentes de Ionic se vean bien */
 @import "@ionic/angular/css/core.css";
 @import "@ionic/angular/css/normalize.css";
@@ -37,11 +41,4 @@ ion-header::after {
   --padding-start: 8px;
   --padding-end: 8px;
   margin-inline-end: 4px;
-}
-
-/* Resalta el ítem activo del menú lateral */
-.menu-activo {
-  --background: var(--ion-color-light);
-  --color: var(--ion-color-primary);
-  font-weight: 600;
 }

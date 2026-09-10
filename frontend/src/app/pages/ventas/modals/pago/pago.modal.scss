@@ -1,0 +1,147 @@
+.cobro-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.cobro-subtotal {
+  font-size: 13px;
+  color: rgba(233, 233, 237, 0.55);
+}
+
+.cobro-modo {
+  align-self: flex-start;
+}
+
+.medios-simple {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.medio-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  border: 1px solid rgba(233, 233, 237, 0.14);
+  background: transparent;
+  color: var(--sl-text);
+  font-family: var(--sl-font);
+  text-align: left;
+
+  i {
+    font-size: 16px;
+  }
+
+  &:hover {
+    border-color: var(--sl-accent);
+  }
+
+  &.active {
+    border-color: var(--sl-accent);
+    background: rgba(145, 132, 217, 0.12);
+    color: #c7c0f5;
+  }
+}
+
+.medio-label {
+  font-size: 13.5px;
+}
+
+.medio-regla {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: rgba(233, 233, 237, 0.5);
+  white-space: nowrap;
+}
+
+.medio-total {
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.lineas-mixtas {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.linea-mixta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.linea-mixta-label {
+  min-width: 104px;
+
+  div:first-child {
+    font-size: 13px;
+  }
+}
+
+.linea-mixta-regla {
+  font-size: 11px;
+  color: rgba(233, 233, 237, 0.45);
+}
+
+.linea-mixta-input {
+  flex: 1;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.linea-mixta-cobra {
+  width: 92px;
+  text-align: right;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: rgba(233, 233, 237, 0.65);
+}
+
+.repartido-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: rgba(233, 233, 237, 0.55);
+  padding-top: 4px;
+
+  span:last-child {
+    white-space: nowrap;
+
+    &.cubierto {
+      color: var(--sl-accent-400);
+    }
+  }
+}
+
+.cobro-error {
+  font-size: 12.5px;
+  color: #ef6a6a;
+}
+
+.total-cobro-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid rgba(233, 233, 237, 0.1);
+
+  span:first-child {
+    font-size: 13px;
+    color: rgba(233, 233, 237, 0.6);
+  }
+}
+
+.total-cobro-valor {
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}

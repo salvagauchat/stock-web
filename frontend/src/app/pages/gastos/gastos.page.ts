@@ -1,67 +1,42 @@
+import { DatePipe } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  AlertController,
-  IonBadge,
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonInput,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonMenuButton,
-  IonSegment,
-  IonSegmentButton,
-  IonTitle,
-  IonToolbar,
-  ModalController,
-  ToastController,
-} from '@ionic/angular/standalone';
-import { AuthService } from '../../core/services/auth.service';
+import { ModalController, ToastController } from '@ionic/angular/standalone';
 import { GastoService } from '../../core/services/gasto.service';
 import { Gasto, TipoGasto } from '../../models/gasto.model';
+import { ConfirmDialogModal } from '../../shared/modals/confirm-dialog/confirm-dialog.modal';
+import { MoneyPipe } from '../../shared/pipes/money.pipe';
 import { CategoriasGastoModal } from './modals/categorias-gasto/categorias-gasto.modal';
 import { GastoFormModal } from './modals/gasto-form/gasto-form.modal';
+
+type Periodo = 'hoy' | 'semana' | 'mes' | 'anio';
+
+const MEDIO_LABEL: Record<string, string> = {
+  EFECTIVO: 'Efectivo',
+  DEBITO: 'Débito',
+  CREDITO: 'Crédito',
+  TRANSFERENCIA: 'Transferencia',
+};
 
 @Component({
   selector: 'app-gastos',
   standalone: true,
-  imports: [
-    FormsModule,
-    IonBadge,
-    IonButton,
-    IonButtons,
-    IonContent,
-    IonHeader,
-    IonIcon,
-    IonInput,
-    IonItem,
-    IonLabel,
-    IonList,
-    IonMenuButton,
-    IonSegment,
-    IonSegmentButton,
-    IonTitle,
-    IonToolbar,
-  ],
+  imports: [FormsModule, DatePipe, MoneyPipe],
   templateUrl: './gastos.page.html',
+  styleUrl: './gastos.page.scss',
 })
 export class GastosPage implements OnInit {
   gastosTodos: Gasto[] = [];
   gastosFiltrados: Gasto[] = [];
   filtroTipo: 'TODOS' | TipoGasto = 'TODOS';
+  periodoActivo: Periodo | null = 'mes';
   desde: string;
   hasta: string;
   cargando = signal(false);
 
   constructor(
     private gastoSvc: GastoService,
-    private auth: AuthService,
     private modalCtrl: ModalController,
-    private alertCtrl: AlertController,
     private toastCtrl: ToastController,
   ) {
     const hoy = new Date();
@@ -96,6 +71,10 @@ export class GastosPage implements OnInit {
     this.aplicarFiltroTipo();
   }
 
+  medioLabel(medio: string): string {
+    return MEDIO_LABEL[medio] ?? medio;
+  }
+
   get totalCorriente(): number {
     return this.gastosTodos.filter((g) => g.categoria_tipo === 'CORRIENTE').reduce((acc, g) => acc + Number(g.monto), 0);
   }
@@ -110,10 +89,10 @@ export class GastosPage implements OnInit {
     return this.totalCorriente + this.totalNoCorriente;
   }
 
-  setearRangoRapido(rango: 'hoy' | 'semana' | 'mes' | 'anio') {
+  setearRangoRapido(periodo: Periodo) {
     const hoy = new Date();
     let inicio: Date;
-    switch (rango) {
+    switch (periodo) {
       case 'hoy':
         inicio = new Date(hoy);
         break;
@@ -128,13 +107,22 @@ export class GastosPage implements OnInit {
         inicio = new Date(hoy.getFullYear(), 0, 1);
         break;
     }
+    this.periodoActivo = periodo;
     this.desde = inicio.toISOString().slice(0, 10);
     this.hasta = hoy.toISOString().slice(0, 10);
     this.cargar();
   }
 
+  fechasPersonalizadas() {
+    this.periodoActivo = null;
+    this.cargar();
+  }
+
   async abrirNuevo() {
-    const modal = await this.modalCtrl.create({ component: GastoFormModal });
+    const modal = await this.modalCtrl.create({
+      component: GastoFormModal,
+      cssClass: ['sl-dialog-modal', 'sl-dialog-modal--gasto'],
+    });
     await modal.present();
     const { data } = await modal.onWillDismiss();
     if (data?.guardado) {
@@ -144,7 +132,11 @@ export class GastosPage implements OnInit {
   }
 
   async abrirEditar(gasto: Gasto) {
-    const modal = await this.modalCtrl.create({ component: GastoFormModal, componentProps: { gasto } });
+    const modal = await this.modalCtrl.create({
+      component: GastoFormModal,
+      componentProps: { gasto },
+      cssClass: ['sl-dialog-modal', 'sl-dialog-modal--gasto'],
+    });
     await modal.present();
     const { data } = await modal.onWillDismiss();
     if (data?.guardado) {
@@ -154,33 +146,34 @@ export class GastosPage implements OnInit {
   }
 
   async confirmarEliminar(gasto: Gasto) {
-    const alert = await this.alertCtrl.create({
-      header: 'Eliminar gasto',
-      message: `¿Eliminar "${gasto.descripcion}" por $${gasto.monto}?`,
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: () => {
-            this.gastoSvc.eliminar(gasto.id).subscribe(() => {
-              this.mostrarToast('Gasto eliminado');
-              this.cargar();
-            });
-          },
-        },
-      ],
+    const modal = await this.modalCtrl.create({
+      component: ConfirmDialogModal,
+      componentProps: {
+        titulo: 'Eliminar gasto',
+        mensaje: `¿Eliminar "${gasto.descripcion}" por $${gasto.monto}?`,
+      },
+      cssClass: ['sl-dialog-modal', 'sl-dialog-modal--confirm'],
     });
-    await alert.present();
+    await modal.present();
+    const { data } = await modal.onWillDismiss();
+    if (data?.confirmado) {
+      this.gastoSvc.eliminar(gasto.id).subscribe(() => {
+        this.mostrarToast('Gasto eliminado');
+        this.cargar();
+      });
+    }
   }
 
   async abrirCategorias() {
-    const modal = await this.modalCtrl.create({ component: CategoriasGastoModal });
+    const modal = await this.modalCtrl.create({
+      component: CategoriasGastoModal,
+      cssClass: ['sl-dialog-modal', 'sl-dialog-modal--categorias-gasto'],
+    });
     await modal.present();
-  }
-
-  logout() {
-    this.auth.logout();
+    const { data } = await modal.onWillDismiss();
+    if (data?.huboCambios) {
+      this.cargar();
+    }
   }
 
   private async mostrarToast(mensaje: string) {

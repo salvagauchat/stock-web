@@ -1,0 +1,20 @@
+<div class="confirm-content">
+  <div class="confirm-icon"><i class="ph ph-warning"></i></div>
+  <div class="sl-dialog-title">{{ titulo }}</div>
+  <div class="sl-dialog-body">{{ mensaje }}</div>
+
+  @if (pedirMotivo) {
+    <div class="sl-field confirm-motivo">
+      <input class="sl-input" type="text" [placeholder]="motivoPlaceholder" [(ngModel)]="motivo" name="motivo" />
+    </div>
+  }
+
+  @if (error()) {
+    <p class="sl-form-error">{{ error() }}</p>
+  }
+
+  <div class="confirm-actions">
+    <button class="sl-btn sl-btn-secondary" type="button" (click)="cancelar()">{{ textoCancelar }}</button>
+    <button class="sl-btn sl-btn-primary confirm-btn" type="button" (click)="confirmar()">{{ textoConfirmar }}</button>
+  </div>
+</div>

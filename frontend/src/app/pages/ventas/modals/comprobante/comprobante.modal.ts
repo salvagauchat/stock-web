@@ -1,35 +1,36 @@
-import { DatePipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import {
-  IonButton,
-  IonContent,
-  IonHeader,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonTitle,
-  IonToolbar,
-  ModalController,
-} from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular/standalone';
 import { VentaDetalle } from '../../../../models/venta.model';
+import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 
 @Component({
   selector: 'app-comprobante',
   standalone: true,
-  imports: [DatePipe, IonButton, IonContent, IonHeader, IonItem, IonLabel, IonList, IonTitle, IonToolbar],
+  imports: [MoneyPipe],
   templateUrl: './comprobante.modal.html',
+  styleUrl: './comprobante.modal.scss',
 })
 export class ComprobanteModal {
   @Input() venta!: VentaDetalle;
 
   constructor(private modalCtrl: ModalController) {}
 
-  etiquetaVariante(d: { variante_talle: string | null; variante_color: string | null }): string {
-    const partes = [d.variante_talle, d.variante_color].filter(Boolean);
-    return partes.length ? ` (${partes.join(' / ')})` : '';
+  get cantidadArticulos(): number {
+    return this.venta.detalles.reduce((acc, d) => acc + d.cantidad, 0);
+  }
+
+  get resumenMedio(): string {
+    if (this.venta.pagos.length > 1) {
+      return 'pago mixto';
+    }
+    return this.venta.pagos[0]?.medio_pago.toLowerCase() ?? '';
   }
 
   cerrar() {
     this.modalCtrl.dismiss();
+  }
+
+  imprimir() {
+    window.print();
   }
 }

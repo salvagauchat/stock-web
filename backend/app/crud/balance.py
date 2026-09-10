@@ -97,6 +97,7 @@ async def obtener_balance(db: AsyncSession, desde: datetime, hasta: datetime) ->
 
     return {
         "ingresos": ingresos,
+        "cantidad_ventas": len(ventas),
         "gastos_corrientes": gastos_corrientes,
         "gastos_no_corrientes": gastos_no_corrientes,
         "ganancia_bruta": ganancia_bruta,

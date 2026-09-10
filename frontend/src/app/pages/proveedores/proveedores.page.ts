@@ -1,48 +1,32 @@
 import { Component, OnInit, signal } from '@angular/core';
-import {
-  AlertController,
-  IonBackButton,
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonTitle,
-  IonToolbar,
-  ModalController,
-  ToastController,
-} from '@ionic/angular/standalone';
+import { forkJoin } from 'rxjs';
+import { ModalController, ToastController } from '@ionic/angular/standalone';
+import { ProductoService } from '../../core/services/producto.service';
 import { ProveedorService } from '../../core/services/proveedor.service';
 import { Proveedor } from '../../models/proveedor.model';
+import { ConfirmDialogModal } from '../../shared/modals/confirm-dialog/confirm-dialog.modal';
 import { ProveedorFormModal } from './modals/proveedor-form/proveedor-form.modal';
+
+interface ProveedorResumen {
+  proveedor: Proveedor;
+  articulos: number;
+}
 
 @Component({
   selector: 'app-proveedores',
   standalone: true,
-  imports: [
-    IonBackButton,
-    IonButton,
-    IonButtons,
-    IonContent,
-    IonHeader,
-    IonItem,
-    IonLabel,
-    IonList,
-    IonTitle,
-    IonToolbar,
-  ],
+  imports: [],
   templateUrl: './proveedores.page.html',
+  styleUrl: './proveedores.page.scss',
 })
 export class ProveedoresPage implements OnInit {
-  proveedores: Proveedor[] = [];
+  resumenes: ProveedorResumen[] = [];
   cargando = signal(false);
 
   constructor(
     private proveedorSvc: ProveedorService,
+    private productoSvc: ProductoService,
     private modalCtrl: ModalController,
-    private alertCtrl: AlertController,
     private toastCtrl: ToastController,
   ) {}
 
@@ -52,17 +36,43 @@ export class ProveedoresPage implements OnInit {
 
   cargar() {
     this.cargando.set(true);
-    this.proveedorSvc.listar(true).subscribe({
-      next: (proveedores) => {
-        this.proveedores = proveedores;
+    // activos=false trae activos e inactivos (ver crud/proveedores.py): acá
+    // se muestran ambos estados en la tabla, a diferencia del resto de las
+    // pantallas que sólo listan activos.
+    forkJoin([this.proveedorSvc.listar(false), this.productoSvc.listar(true)]).subscribe({
+      next: ([proveedores, productos]) => {
+        this.resumenes = proveedores.map((proveedor) => ({
+          proveedor,
+          articulos: productos.filter((p) => p.proveedor_id === proveedor.id).length,
+        }));
         this.cargando.set(false);
       },
       error: () => this.cargando.set(false),
     });
   }
 
+  get cantidadActivos(): number {
+    return this.resumenes.filter((r) => r.proveedor.activo).length;
+  }
+
+  get cantidadBaja(): number {
+    return this.resumenes.filter((r) => !r.proveedor.activo).length;
+  }
+
+  iniciales(nombre: string): string {
+    return nombre
+      .split(/\s+/)
+      .map((palabra) => palabra[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
+  }
+
   async abrirNuevo() {
-    const modal = await this.modalCtrl.create({ component: ProveedorFormModal });
+    const modal = await this.modalCtrl.create({
+      component: ProveedorFormModal,
+      cssClass: ['sl-dialog-modal', 'sl-dialog-modal--proveedor'],
+    });
     await modal.present();
     const { data } = await modal.onWillDismiss();
     if (data?.guardado) {
@@ -75,6 +85,7 @@ export class ProveedoresPage implements OnInit {
     const modal = await this.modalCtrl.create({
       component: ProveedorFormModal,
       componentProps: { proveedor },
+      cssClass: ['sl-dialog-modal', 'sl-dialog-modal--proveedor'],
     });
     await modal.present();
     const { data } = await modal.onWillDismiss();
@@ -85,24 +96,22 @@ export class ProveedoresPage implements OnInit {
   }
 
   async confirmarEliminar(proveedor: Proveedor) {
-    const alert = await this.alertCtrl.create({
-      header: 'Eliminar proveedor',
-      message: `¿Eliminar "${proveedor.nombre}"? Los productos que lo usan lo mantienen como referencia histórica.`,
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: () => {
-            this.proveedorSvc.eliminar(proveedor.id).subscribe(() => {
-              this.mostrarToast('Proveedor eliminado');
-              this.cargar();
-            });
-          },
-        },
-      ],
+    const modal = await this.modalCtrl.create({
+      component: ConfirmDialogModal,
+      componentProps: {
+        titulo: 'Eliminar proveedor',
+        mensaje: `¿Eliminar "${proveedor.nombre}"? Los productos que lo usan lo mantienen como referencia histórica.`,
+      },
+      cssClass: ['sl-dialog-modal', 'sl-dialog-modal--confirm'],
     });
-    await alert.present();
+    await modal.present();
+    const { data } = await modal.onWillDismiss();
+    if (data?.confirmado) {
+      this.proveedorSvc.eliminar(proveedor.id).subscribe(() => {
+        this.mostrarToast('Proveedor eliminado');
+        this.cargar();
+      });
+    }
   }
 
   private async mostrarToast(mensaje: string) {

@@ -16,6 +16,10 @@ export interface CategoriaGastoCreate {
   descripcion?: string;
 }
 
+export interface CategoriaGastoUpdate extends CategoriaGastoCreate {
+  activo: boolean;
+}
+
 export interface Gasto {
   id: number;
   fecha: string;

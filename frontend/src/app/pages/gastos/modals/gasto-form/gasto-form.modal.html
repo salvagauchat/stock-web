@@ -1,68 +1,65 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>{{ esEdicion ? 'Editar gasto' : 'Nuevo gasto' }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="cancelar()">Cerrar</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<div class="sl-dialog-content">
+  <div class="sl-dialog-title">{{ esEdicion ? 'Editar gasto' : 'Nuevo gasto' }}</div>
 
-<ion-content class="ion-padding">
-  <ion-item>
-    <ion-label position="stacked">Categoría</ion-label>
-    <ion-select [(ngModel)]="categoriaGastoId" name="categoria" interface="popover">
-      @for (cat of categorias; track cat.id) {
-        <ion-select-option [value]="cat.id">{{ cat.nombre }} ({{ cat.tipo === 'CORRIENTE' ? 'corriente' : 'no corriente' }})</ion-select-option>
-      }
-    </ion-select>
-  </ion-item>
+  <div class="sl-field">
+    <label for="descripcion">Descripción</label>
+    <input id="descripcion" class="sl-input" [(ngModel)]="descripcion" name="descripcion" required />
+  </div>
 
-  <ion-item>
-    <ion-label position="stacked">Descripción</ion-label>
-    <ion-input [(ngModel)]="descripcion" name="descripcion" required></ion-input>
-  </ion-item>
+  <div class="sl-field-row">
+    <div class="sl-field">
+      <label for="categoria">Categoría</label>
+      <select id="categoria" class="sl-input" [(ngModel)]="categoriaGastoId" name="categoria">
+        <option [ngValue]="null" disabled>Elegir categoría</option>
+        @for (cat of categorias; track cat.id) {
+          <option [ngValue]="cat.id">{{ cat.nombre }} ({{ cat.tipo === 'CORRIENTE' ? 'corriente' : 'no corriente' }})</option>
+        }
+      </select>
+    </div>
+    <div class="sl-field">
+      <label for="monto">Monto</label>
+      <input id="monto" class="sl-input" type="number" min="0" [(ngModel)]="monto" name="monto" />
+    </div>
+  </div>
 
-  <ion-item>
-    <ion-label position="stacked">Monto</ion-label>
-    <ion-input type="number" [(ngModel)]="monto" name="monto"></ion-input>
-  </ion-item>
+  <div class="sl-field-row">
+    <div class="sl-field">
+      <label for="medioPago">Medio de pago</label>
+      <select id="medioPago" class="sl-input" [(ngModel)]="medioPago" name="medioPago">
+        @for (medio of mediosPago; track medio) {
+          <option [ngValue]="medio">{{ medio }}</option>
+        }
+      </select>
+    </div>
+    <div class="sl-field">
+      <label for="proveedor">Proveedor (opcional)</label>
+      <select id="proveedor" class="sl-input" [(ngModel)]="proveedorId" name="proveedor">
+        <option [ngValue]="null">Sin proveedor</option>
+        @for (prov of proveedores; track prov.id) {
+          <option [ngValue]="prov.id">{{ prov.nombre }}</option>
+        }
+      </select>
+    </div>
+  </div>
 
-  <ion-item>
-    <ion-label position="stacked">Medio de pago</ion-label>
-    <ion-select [(ngModel)]="medioPago" name="medioPago" interface="popover">
-      @for (medio of mediosPago; track medio) {
-        <ion-select-option [value]="medio">{{ medio }}</ion-select-option>
-      }
-    </ion-select>
-  </ion-item>
+  <div class="sl-field">
+    <label for="comprobante">N° de comprobante</label>
+    <input id="comprobante" class="sl-input" [(ngModel)]="comprobanteNumero" name="comprobanteNumero" />
+  </div>
 
-  <ion-item>
-    <ion-label position="stacked">Proveedor (opcional)</ion-label>
-    <ion-select [(ngModel)]="proveedorId" name="proveedor" interface="popover">
-      <ion-select-option [value]="null">Sin proveedor</ion-select-option>
-      @for (prov of proveedores; track prov.id) {
-        <ion-select-option [value]="prov.id">{{ prov.nombre }}</ion-select-option>
-      }
-    </ion-select>
-  </ion-item>
-
-  <ion-item>
-    <ion-label position="stacked">N° de comprobante</ion-label>
-    <ion-input [(ngModel)]="comprobanteNumero" name="comprobanteNumero"></ion-input>
-  </ion-item>
-
-  <ion-item>
-    <ion-label position="stacked">Notas</ion-label>
-    <ion-input [(ngModel)]="notas" name="notas"></ion-input>
-  </ion-item>
+  <div class="sl-field">
+    <label for="notas">Notas</label>
+    <input id="notas" class="sl-input" [(ngModel)]="notas" name="notas" />
+  </div>
 
   @if (error()) {
-    <ion-text color="danger">
-      <p>{{ error() }}</p>
-    </ion-text>
+    <p class="sl-form-error">{{ error() }}</p>
   }
 
-  <ion-button expand="block" class="ion-margin-top" (click)="guardar()" [disabled]="guardando()">
-    {{ guardando() ? 'Guardando...' : 'Guardar' }}
-  </ion-button>
-</ion-content>
+  <div class="sl-dialog-actions">
+    <button class="sl-btn sl-btn-secondary" type="button" (click)="cancelar()">Cancelar</button>
+    <button class="sl-btn sl-btn-primary" type="button" [disabled]="guardando()" (click)="guardar()">
+      {{ guardando() ? 'Guardando...' : 'Guardar' }}
+    </button>
+  </div>
+</div>

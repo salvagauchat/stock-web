@@ -10,6 +10,7 @@ from app.deps import get_current_user
 from app.schemas.gasto import (
     CategoriaGastoCreate,
     CategoriaGastoOut,
+    CategoriaGastoUpdate,
     GastoCreate,
     GastoOut,
     GastoUpdate,
@@ -70,3 +71,21 @@ async def crear_categoria(datos: CategoriaGastoCreate, db: AsyncSession = Depend
         return await crud.crear_categoria(db, datos)
     except crud.ConflictoError as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=exc.mensaje)
+
+
+@router_categorias.put("/{categoria_id}", response_model=CategoriaGastoOut)
+async def actualizar_categoria(categoria_id: int, datos: CategoriaGastoUpdate, db: AsyncSession = Depends(get_db)):
+    try:
+        return await crud.actualizar_categoria(db, categoria_id, datos)
+    except crud.NoEncontradoError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Categoría de gasto no encontrada")
+    except crud.ConflictoError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=exc.mensaje)
+
+
+@router_categorias.delete("/{categoria_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def eliminar_categoria(categoria_id: int, db: AsyncSession = Depends(get_db)):
+    try:
+        await crud.eliminar_categoria(db, categoria_id)
+    except crud.NoEncontradoError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Categoría de gasto no encontrada")

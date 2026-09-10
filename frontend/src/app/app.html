@@ -1,45 +1,54 @@
 @if (auth.autenticado()) {
   <ion-app>
-    <ion-split-pane content-id="main-content" when="md">
-      <ion-menu content-id="main-content" type="overlay">
-        <ion-header>
-          <ion-toolbar>
-            <ion-title class="brand-title">StockLocal</ion-title>
-          </ion-toolbar>
-        </ion-header>
-        <ion-content>
-          <ion-list lines="none">
-            <ion-accordion-group value="ventas">
-              <ion-accordion value="ventas">
-                <ion-item slot="header" button detail="false">
-                  <ion-label>Ventas</ion-label>
-                </ion-item>
-                <ion-list slot="content">
-                  <ion-item routerLink="/ventas" routerLinkActive="menu-activo" button detail="false">Vender</ion-item>
-                  <ion-item routerLink="/historial" routerLinkActive="menu-activo" button detail="false">Historial</ion-item>
-                </ion-list>
-              </ion-accordion>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <div class="sidebar-brand-mark"><i class="ph ph-coat-hanger"></i></div>
+          <span class="sidebar-brand-name">StockLocal</span>
+        </div>
 
-              <ion-accordion value="stock">
-                <ion-item slot="header" button detail="false">
-                  <ion-label>Stock</ion-label>
-                </ion-item>
-                <ion-list slot="content">
-                  <ion-item routerLink="/stock" routerLinkActive="menu-activo" button detail="false">Productos</ion-item>
-                  <ion-item routerLink="/categorias" routerLinkActive="menu-activo" button detail="false">Categorías</ion-item>
-                  <ion-item routerLink="/proveedores" routerLinkActive="menu-activo" button detail="false">Proveedores</ion-item>
-                </ion-list>
-              </ion-accordion>
-            </ion-accordion-group>
+        <div class="sidebar-group-label">Operación</div>
+        <a class="sidebar-item" routerLink="/ventas" routerLinkActive="active">
+          <i class="ph ph-shopping-cart"></i>
+          <span>Ventas</span>
+        </a>
 
-            <ion-item routerLink="/gastos" routerLinkActive="menu-activo" button detail="false">Gastos</ion-item>
-            <ion-item routerLink="/balance" routerLinkActive="menu-activo" button detail="false">Balance</ion-item>
-          </ion-list>
-        </ion-content>
-      </ion-menu>
+        <a class="sidebar-item" [class.active]="stockActivo()" routerLink="/stock">
+          <i class="ph ph-stack"></i>
+          <span>Stock</span>
+          <i class="ph ph-caret-down sidebar-item-caret"></i>
+        </a>
+        <div class="sidebar-submenu">
+          <a routerLink="/stock" routerLinkActive="active">Productos</a>
+          <a routerLink="/categorias" routerLinkActive="active">Categorías</a>
+          <a routerLink="/proveedores" routerLinkActive="active">Proveedores</a>
+        </div>
 
-      <ion-router-outlet id="main-content"></ion-router-outlet>
-    </ion-split-pane>
+        <div class="sidebar-group-label">Finanzas</div>
+        <a class="sidebar-item" routerLink="/gastos" routerLinkActive="active">
+          <i class="ph ph-wallet"></i>
+          <span>Gastos</span>
+        </a>
+        <a class="sidebar-item" routerLink="/balance" routerLinkActive="active">
+          <i class="ph ph-chart-line"></i>
+          <span>Balance</span>
+        </a>
+
+        <div class="sidebar-spacer"></div>
+
+        <div class="sidebar-user">
+          <div class="avatar">{{ iniciales() }}</div>
+          <span class="sidebar-user-name">{{ auth.usuario()?.nombre }}</span>
+          <button class="logout-btn" type="button" (click)="logout()" aria-label="Cerrar sesión">
+            <i class="ph ph-sign-out"></i>
+          </button>
+        </div>
+      </aside>
+
+      <div class="content-area">
+        <ion-router-outlet></ion-router-outlet>
+      </div>
+    </div>
   </ion-app>
 } @else {
   <ion-app>

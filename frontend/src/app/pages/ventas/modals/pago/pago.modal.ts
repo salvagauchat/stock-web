@@ -1,25 +1,10 @@
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonInput,
-  IonItem,
-  IonLabel,
-  IonSegment,
-  IonSegmentButton,
-  IonSelect,
-  IonSelectOption,
-  IonText,
-  IonTitle,
-  IonToolbar,
-  ModalController,
-} from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular/standalone';
 import { ConfigMedioPagoService } from '../../../../core/services/config-medio-pago.service';
 import { ConfigMedioPago, MedioPago } from '../../../../models/config-medio-pago.model';
 import { PagoCreate } from '../../../../models/venta.model';
+import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 
 interface LineaMixta {
   medio_pago: MedioPago;
@@ -35,27 +20,19 @@ const CUOTAS_OPCIONES = [
   { cuotas: 12, recargo: 35 },
 ];
 
+const ICONO_POR_MEDIO: Record<MedioPago, string> = {
+  EFECTIVO: 'ph-money',
+  TRANSFERENCIA: 'ph-arrows-left-right',
+  DEBITO: 'ph-credit-card',
+  CREDITO: 'ph-credit-card',
+};
+
 @Component({
   selector: 'app-pago',
   standalone: true,
-  imports: [
-    FormsModule,
-    IonButton,
-    IonButtons,
-    IonContent,
-    IonHeader,
-    IonInput,
-    IonItem,
-    IonLabel,
-    IonSegment,
-    IonSegmentButton,
-    IonSelect,
-    IonSelectOption,
-    IonText,
-    IonTitle,
-    IonToolbar,
-  ],
+  imports: [FormsModule, MoneyPipe],
   templateUrl: './pago.modal.html',
+  styleUrl: './pago.modal.scss',
 })
 export class PagoModal implements OnInit {
   @Input() subtotal = 0;
@@ -97,22 +74,48 @@ export class PagoModal implements OnInit {
     this.error.set(null);
   }
 
+  icono(medio: MedioPago): string {
+    return ICONO_POR_MEDIO[medio];
+  }
+
+  private recargoVigente(config: ConfigMedioPago): number {
+    if (config.medio_pago === 'CREDITO') {
+      return this.cuotasOpciones.find((o) => o.cuotas === this.cuotas)?.recargo ?? 0;
+    }
+    return Number(config.recargo_porcentaje);
+  }
+
+  regla(config: ConfigMedioPago): string {
+    const desc = Number(config.descuento_porcentaje);
+    const rec = this.recargoVigente(config);
+    if (desc) {
+      return `${desc}% desc.`;
+    }
+    if (rec) {
+      return `${rec}% rec.`;
+    }
+    return 'sin ajuste';
+  }
+
+  totalParaConfig(config: ConfigMedioPago): number {
+    const desc = Number(config.descuento_porcentaje);
+    const rec = this.recargoVigente(config);
+    return this.subtotal * (1 - desc / 100) * (1 + rec / 100);
+  }
+
   seleccionarSimple(config: ConfigMedioPago) {
     this.medioSeleccionado = config.medio_pago;
     this.descuentoPorcentaje = Number(config.descuento_porcentaje);
-    this.recargoPorcentaje = Number(config.recargo_porcentaje);
-    this.cuotas = 1;
+    this.recargoPorcentaje = this.recargoVigente(config);
+    if (config.medio_pago !== 'CREDITO') {
+      this.cuotas = 1;
+    }
   }
 
   elegirCuotas(opcion: { cuotas: number; recargo: number }) {
     this.cuotas = opcion.cuotas;
-    this.recargoPorcentaje = opcion.recargo;
-  }
-
-  onCuotasChange(valor: number) {
-    const opcion = this.cuotasOpciones.find((o) => o.cuotas === valor);
-    if (opcion) {
-      this.elegirCuotas(opcion);
+    if (this.medioSeleccionado === 'CREDITO') {
+      this.recargoPorcentaje = opcion.recargo;
     }
   }
 
@@ -129,22 +132,23 @@ export class PagoModal implements OnInit {
   }
 
   get diferenciaMixto(): number {
-    return this.subtotal - this.sumaSubtotalMixto;
+    return Math.max(0, this.subtotal - this.sumaSubtotalMixto);
+  }
+
+  get mixtoCubierto(): boolean {
+    return this.sumaSubtotalMixto >= this.subtotal;
   }
 
   get totalMixto(): number {
-    return this.lineasMixtas
-      .filter((l) => l.monto_subtotal > 0)
-      .reduce((acc, l) => acc + this.totalLinea(l), 0);
+    return this.lineasMixtas.filter((l) => l.monto_subtotal > 0).reduce((acc, l) => acc + this.totalLinea(l), 0);
   }
 
   get mixtoValido(): boolean {
-    return Math.abs(this.diferenciaMixto) < 0.01 && this.totalMixto > 0;
+    return Math.abs(this.subtotal - this.sumaSubtotalMixto) < 0.01 && this.totalMixto > 0;
   }
 
-  asignarRestoA(linea: LineaMixta) {
-    const otras = this.sumaSubtotalMixto - (linea.monto_subtotal || 0);
-    linea.monto_subtotal = Math.max(0, this.subtotal - otras);
+  get totalACobrar(): number {
+    return this.modo === 'simple' ? this.totalSimple : this.totalMixto;
   }
 
   confirmar() {

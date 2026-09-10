@@ -26,6 +26,7 @@ class BalanceDiarioItem(BaseModel):
 
 class BalanceOut(BaseModel):
     ingresos: Decimal
+    cantidad_ventas: int
     gastos_corrientes: Decimal
     gastos_no_corrientes: Decimal
     ganancia_bruta: Decimal

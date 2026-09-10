@@ -1,53 +1,86 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Categorías de gasto</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="cerrar()">Cerrar</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<ng-template #fila let-c>
+  <div class="categoria-row">
+    <div class="categoria-row-info">
+      <span>{{ c.nombre }}</span>
+      @if (!c.activo) {
+        <span class="sl-tag sl-tag-neutral categoria-baja">Dada de baja</span>
+      }
+    </div>
+    <div class="categoria-row-acciones">
+      <button class="sl-btn sl-btn-ghost" type="button" (click)="editar(c)" aria-label="Editar">
+        <i class="ph ph-pencil-simple"></i>
+      </button>
+      @if (c.activo) {
+        <button class="sl-btn sl-btn-ghost categoria-eliminar" type="button" (click)="eliminar(c)" aria-label="Eliminar">
+          <i class="ph ph-trash"></i>
+        </button>
+      } @else {
+        <button class="sl-btn sl-btn-ghost categoria-reactivar" type="button" (click)="reactivar(c)" aria-label="Reactivar">
+          <i class="ph ph-arrow-counter-clockwise"></i>
+        </button>
+      }
+    </div>
+  </div>
+</ng-template>
 
-<ion-content class="ion-padding">
-  <h3>Corrientes</h3>
-  <ion-list>
+<div class="sl-dialog-content categorias-gasto-dialog">
+  <div class="dialog-header">
+    <div class="sl-dialog-title">Categorías de gasto</div>
+    <button class="sl-btn sl-btn-secondary" type="button" (click)="cerrar()">Cerrar</button>
+  </div>
+
+  <div class="categorias-grupo">
+    <div class="grupo-titulo">Corrientes</div>
     @for (c of categoriasCorrientes; track c.id) {
-      <ion-item>
-        <ion-label>{{ c.nombre }}</ion-label>
-      </ion-item>
+      <ng-container [ngTemplateOutlet]="fila" [ngTemplateOutletContext]="{ $implicit: c }"></ng-container>
+    } @empty {
+      <p class="categorias-vacio">Sin categorías corrientes.</p>
     }
-  </ion-list>
+  </div>
 
-  <h3>No corrientes</h3>
-  <ion-list>
+  <div class="categorias-grupo">
+    <div class="grupo-titulo">No corrientes</div>
     @for (c of categoriasNoCorrientes; track c.id) {
-      <ion-item>
-        <ion-label>{{ c.nombre }}</ion-label>
-      </ion-item>
+      <ng-container [ngTemplateOutlet]="fila" [ngTemplateOutletContext]="{ $implicit: c }"></ng-container>
+    } @empty {
+      <p class="categorias-vacio">Sin categorías no corrientes.</p>
     }
-  </ion-list>
+  </div>
 
-  <h3 class="ion-margin-top">Agregar categoría</h3>
-  <ion-item>
-    <ion-label position="stacked">Nombre</ion-label>
-    <ion-input [(ngModel)]="nombre" name="nombre"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-label position="stacked">Tipo</ion-label>
-    <ion-select [(ngModel)]="tipo" name="tipo">
-      <ion-select-option value="CORRIENTE">Corriente</ion-select-option>
-      <ion-select-option value="NO_CORRIENTE">No corriente</ion-select-option>
-    </ion-select>
-  </ion-item>
-  <ion-item>
-    <ion-label position="stacked">Descripción</ion-label>
-    <ion-input [(ngModel)]="descripcion" name="descripcion"></ion-input>
-  </ion-item>
+  <div class="nueva-categoria" #formSection>
+    <div class="sl-dialog-title nueva-categoria-title">{{ editando ? 'Editar categoría' : 'Agregar categoría' }}</div>
 
-  @if (error()) {
-    <ion-text color="danger">
-      <p>{{ error() }}</p>
-    </ion-text>
-  }
+    <div class="sl-field">
+      <label for="nombre">Nombre</label>
+      <input id="nombre" class="sl-input" [(ngModel)]="nombre" name="nombre" />
+    </div>
 
-  <ion-button expand="block" class="ion-margin-top" (click)="agregar()">+ Agregar categoría</ion-button>
-</ion-content>
+    <div class="sl-field-row">
+      <div class="sl-field">
+        <label for="tipo">Tipo</label>
+        <select id="tipo" class="sl-input" [(ngModel)]="tipo" name="tipo">
+          <option value="CORRIENTE">Corriente</option>
+          <option value="NO_CORRIENTE">No corriente</option>
+        </select>
+      </div>
+      <div class="sl-field">
+        <label for="descripcion">Descripción</label>
+        <input id="descripcion" class="sl-input" [(ngModel)]="descripcion" name="descripcion" />
+      </div>
+    </div>
+
+    @if (error()) {
+      <p class="sl-form-error">{{ error() }}</p>
+    }
+
+    <div class="nueva-categoria-actions">
+      @if (editando) {
+        <button class="sl-btn sl-btn-secondary" type="button" (click)="cancelarEdicion()">Cancelar</button>
+      }
+      <button class="sl-btn sl-btn-primary" type="button" [disabled]="guardando()" (click)="guardar()">
+        <i class="ph" [class.ph-plus]="!editando" [class.ph-check]="editando"></i>
+        {{ guardando() ? 'Guardando...' : editando ? 'Guardar cambios' : 'Agregar categoría' }}
+      </button>
+    </div>
+  </div>
+</div>

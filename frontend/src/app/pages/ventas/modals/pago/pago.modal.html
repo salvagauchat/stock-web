@@ -1,77 +1,77 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Cobrar</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="cancelar()">Cerrar</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<div class="sl-dialog-content">
+  <div class="cobro-header">
+    <div class="sl-dialog-title">Cobrar</div>
+    <div class="cobro-subtotal">Subtotal {{ subtotal | money }}</div>
+  </div>
 
-<ion-content class="ion-padding">
-  <h2>Subtotal: ${{ subtotal.toFixed(2) }}</h2>
-
-  <ion-segment [value]="modo" (ionChange)="cambiarModo($any($event.detail.value))">
-    <ion-segment-button value="simple">
-      <ion-label>Un medio</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="mixto">
-      <ion-label>Mixto</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+  <div class="sl-seg cobro-modo">
+    <button class="sl-seg-opt" type="button" [class.active]="modo === 'simple'" (click)="cambiarModo('simple')">
+      Un medio
+    </button>
+    <button class="sl-seg-opt" type="button" [class.active]="modo === 'mixto'" (click)="cambiarModo('mixto')">
+      Mixto
+    </button>
+  </div>
 
   @if (modo === 'simple') {
-    <div class="ion-margin-top">
+    <div class="medios-simple">
       @for (config of configs; track config.medio_pago) {
-        <ion-button
-          expand="block"
-          [fill]="medioSeleccionado === config.medio_pago ? 'solid' : 'outline'"
+        <button
+          class="medio-opt"
+          type="button"
+          [class.active]="medioSeleccionado === config.medio_pago"
           (click)="seleccionarSimple(config)"
         >
-          {{ config.medio_pago }} ({{ config.descuento_porcentaje }}% desc. / {{ config.recargo_porcentaje }}% rec.)
-        </ion-button>
-      }
-
-      @if (medioSeleccionado === 'CREDITO') {
-        <ion-item>
-          <ion-label position="stacked">Cuotas</ion-label>
-          <ion-select [(ngModel)]="cuotas" name="cuotas" (ionChange)="onCuotasChange($any($event.detail.value))">
-            @for (opcion of cuotasOpciones; track opcion.cuotas) {
-              <ion-select-option [value]="opcion.cuotas">{{ opcion.cuotas }} cuotas ({{ opcion.recargo }}% recargo)</ion-select-option>
-            }
-          </ion-select>
-        </ion-item>
-      }
-
-      @if (medioSeleccionado) {
-        <h3 class="ion-margin-top">Total a cobrar: ${{ totalSimple.toFixed(2) }}</h3>
+          <i class="ph" [class]="icono(config.medio_pago)"></i>
+          <span class="medio-label">{{ config.medio_pago }}</span>
+          <span class="medio-regla">{{ regla(config) }}</span>
+          <span class="medio-total">{{ totalParaConfig(config) | money }}</span>
+        </button>
       }
     </div>
-  } @else {
-    <div class="ion-margin-top">
-      @for (linea of lineasMixtas; track linea.medio_pago) {
-        <ion-item>
-          <ion-label position="stacked">
-            {{ linea.medio_pago }} ({{ linea.descuento_porcentaje }}% desc. / {{ linea.recargo_porcentaje }}% rec.)
-          </ion-label>
-          <ion-input type="number" [(ngModel)]="linea.monto_subtotal" [name]="linea.medio_pago"></ion-input>
-        </ion-item>
-        <ion-button fill="clear" size="small" (click)="asignarRestoA(linea)">Completar con el resto</ion-button>
-        <p>Cobra: ${{ totalLinea(linea).toFixed(2) }}</p>
-      }
 
-      <h3 class="ion-margin-top">
-        Repartido: ${{ sumaSubtotalMixto.toFixed(2) }} / ${{ subtotal.toFixed(2) }}
-        (falta: ${{ diferenciaMixto.toFixed(2) }})
-      </h3>
-      <h3>Total a cobrar: ${{ totalMixto.toFixed(2) }}</h3>
+    @if (medioSeleccionado === 'CREDITO') {
+      <div class="sl-field">
+        <label>Cuotas</label>
+        <div class="sl-seg">
+          @for (opcion of cuotasOpciones; track opcion.cuotas) {
+            <button class="sl-seg-opt" type="button" [class.active]="cuotas === opcion.cuotas" (click)="elegirCuotas(opcion)">
+              {{ opcion.cuotas === 1 ? '1 pago' : opcion.cuotas + ' cuotas · ' + opcion.recargo + '%' }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+  } @else {
+    <div class="lineas-mixtas">
+      @for (linea of lineasMixtas; track linea.medio_pago) {
+        <div class="linea-mixta">
+          <div class="linea-mixta-label">
+            <div>{{ linea.medio_pago }}</div>
+            <div class="linea-mixta-regla">{{ linea.descuento_porcentaje ? linea.descuento_porcentaje + '% desc.' : 'sin ajuste' }}</div>
+          </div>
+          <input class="sl-input linea-mixta-input" type="number" min="0" [(ngModel)]="linea.monto_subtotal" [name]="linea.medio_pago" />
+          <div class="linea-mixta-cobra">{{ totalLinea(linea) | money }}</div>
+        </div>
+      }
+      <div class="repartido-row">
+        <span>Repartido {{ sumaSubtotalMixto | money }} de {{ subtotal | money }}</span>
+        <span [class.cubierto]="mixtoCubierto">falta {{ diferenciaMixto | money }}</span>
+      </div>
     </div>
   }
 
   @if (error()) {
-    <ion-text color="danger">
-      <p>{{ error() }}</p>
-    </ion-text>
+    <div class="cobro-error">{{ error() }}</div>
   }
 
-  <ion-button expand="block" class="ion-margin-top" (click)="confirmar()">Confirmar cobro</ion-button>
-</ion-content>
+  <div class="total-cobro-row">
+    <span>Total a cobrar</span>
+    <span class="total-cobro-valor">{{ totalACobrar | money }}</span>
+  </div>
+
+  <div class="sl-dialog-actions">
+    <button class="sl-btn sl-btn-secondary" type="button" (click)="cancelar()">Cerrar</button>
+    <button class="sl-btn sl-btn-primary" type="button" (click)="confirmar()">Confirmar cobro</button>
+  </div>
+</div>

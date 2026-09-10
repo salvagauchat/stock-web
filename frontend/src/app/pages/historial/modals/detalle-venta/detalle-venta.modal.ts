@@ -1,7 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input, OnInit, signal } from '@angular/core';
 import {
-  AlertController,
   IonButton,
   IonButtons,
   IonContent,
@@ -15,6 +14,7 @@ import {
 } from '@ionic/angular/standalone';
 import { VentaService } from '../../../../core/services/venta.service';
 import { VentaDetalle } from '../../../../models/venta.model';
+import { ConfirmDialogModal } from '../../../../shared/modals/confirm-dialog/confirm-dialog.modal';
 
 @Component({
   selector: 'app-detalle-venta',
@@ -32,7 +32,6 @@ export class DetalleVentaModal implements OnInit {
   constructor(
     private modalCtrl: ModalController,
     private ventaSvc: VentaService,
-    private alertCtrl: AlertController,
   ) {}
 
   ngOnInit() {
@@ -56,29 +55,26 @@ export class DetalleVentaModal implements OnInit {
   }
 
   async anular() {
-    const alert = await this.alertCtrl.create({
-      header: 'Anular venta',
-      message: 'Esta acción repone el stock vendido. Contá el motivo:',
-      inputs: [{ name: 'motivo', type: 'text', placeholder: 'Motivo (obligatorio)' }],
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Anular',
-          role: 'destructive',
-          handler: (data) => {
-            if (!data.motivo || !data.motivo.trim()) {
-              return false;
-            }
-            this.ventaSvc.anular(this.ventaId, data.motivo.trim()).subscribe(() => {
-              this.huboCambios = true;
-              this.cargar();
-            });
-            return true;
-          },
-        },
-      ],
+    const modal = await this.modalCtrl.create({
+      component: ConfirmDialogModal,
+      componentProps: {
+        titulo: 'Anular venta',
+        mensaje: 'Esta acción repone el stock vendido. Contá el motivo:',
+        textoConfirmar: 'Anular',
+        pedirMotivo: true,
+        motivoPlaceholder: 'Motivo (obligatorio)',
+        motivoRequerido: true,
+      },
+      cssClass: ['sl-dialog-modal', 'sl-dialog-modal--confirm'],
     });
-    await alert.present();
+    await modal.present();
+    const { data } = await modal.onWillDismiss();
+    if (data?.confirmado) {
+      this.ventaSvc.anular(this.ventaId, data.motivo).subscribe(() => {
+        this.huboCambios = true;
+        this.cargar();
+      });
+    }
   }
 
   cerrar() {

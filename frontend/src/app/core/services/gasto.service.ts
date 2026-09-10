@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CategoriaGasto, CategoriaGastoCreate, Gasto, GastoCreate, TipoGasto } from '../../models/gasto.model';
+import { CategoriaGasto, CategoriaGastoCreate, CategoriaGastoUpdate, Gasto, GastoCreate, TipoGasto } from '../../models/gasto.model';
 
 @Injectable({ providedIn: 'root' })
 export class GastoService {
@@ -31,11 +31,19 @@ export class GastoService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
-  listarCategorias(): Observable<CategoriaGasto[]> {
-    return this.http.get<CategoriaGasto[]>(this.baseUrlCategorias);
+  listarCategorias(activas = true): Observable<CategoriaGasto[]> {
+    return this.http.get<CategoriaGasto[]>(this.baseUrlCategorias, { params: { activas } });
   }
 
   crearCategoria(datos: CategoriaGastoCreate): Observable<CategoriaGasto> {
     return this.http.post<CategoriaGasto>(this.baseUrlCategorias, datos);
+  }
+
+  actualizarCategoria(id: number, datos: CategoriaGastoUpdate): Observable<CategoriaGasto> {
+    return this.http.put<CategoriaGasto>(`${this.baseUrlCategorias}/${id}`, datos);
+  }
+
+  eliminarCategoria(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrlCategorias}/${id}`);
   }
 }

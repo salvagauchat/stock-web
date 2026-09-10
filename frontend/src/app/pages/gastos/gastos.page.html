@@ -1,64 +1,124 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title class="brand-title">Gastos</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="abrirCategorias()">Categorías de gasto</ion-button>
-      <ion-button class="logout-button" (click)="logout()">
-        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<div class="page">
+  <header class="page-header">
+    <div class="page-header-titles">
+      <h1>Gastos</h1>
+      <p>{{ gastosTodos.length }} gastos cargados en el período</p>
+    </div>
+    <div class="page-header-actions">
+      <button class="sl-btn sl-btn-secondary" type="button" (click)="abrirCategorias()">
+        <i class="ph ph-tag"></i>
+        Categorías de gasto
+      </button>
+      <button class="sl-btn sl-btn-primary" type="button" (click)="abrirNuevo()">
+        <i class="ph ph-plus"></i>
+        Nuevo gasto
+      </button>
+    </div>
+  </header>
 
-<ion-content class="ion-padding">
-  <ion-item>
-    <ion-label position="stacked">Desde</ion-label>
-    <ion-input type="date" [(ngModel)]="desde" (ionChange)="cargar()"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-label position="stacked">Hasta</ion-label>
-    <ion-input type="date" [(ngModel)]="hasta" (ionChange)="cargar()"></ion-input>
-  </ion-item>
+  <div class="gastos-body">
+    <div class="filtros-row">
+      <div class="sl-seg">
+        <button class="sl-seg-opt" type="button" [class.active]="periodoActivo === 'hoy'" (click)="setearRangoRapido('hoy')">Hoy</button>
+        <button class="sl-seg-opt" type="button" [class.active]="periodoActivo === 'semana'" (click)="setearRangoRapido('semana')">
+          Semana
+        </button>
+        <button class="sl-seg-opt" type="button" [class.active]="periodoActivo === 'mes'" (click)="setearRangoRapido('mes')">Mes</button>
+        <button class="sl-seg-opt" type="button" [class.active]="periodoActivo === 'anio'" (click)="setearRangoRapido('anio')">Año</button>
+      </div>
 
-  <div class="ion-margin-vertical" style="display:flex; gap:8px; flex-wrap:wrap;">
-    <ion-button size="small" fill="outline" (click)="setearRangoRapido('hoy')">Hoy</ion-button>
-    <ion-button size="small" fill="outline" (click)="setearRangoRapido('semana')">Última semana</ion-button>
-    <ion-button size="small" fill="outline" (click)="setearRangoRapido('mes')">Este mes</ion-button>
-    <ion-button size="small" fill="outline" (click)="setearRangoRapido('anio')">Este año</ion-button>
+      <div class="sl-seg">
+        <button class="sl-seg-opt" type="button" [class.active]="filtroTipo === 'TODOS'" (click)="cambiarFiltroTipo('TODOS')">
+          Todos
+        </button>
+        <button class="sl-seg-opt" type="button" [class.active]="filtroTipo === 'CORRIENTE'" (click)="cambiarFiltroTipo('CORRIENTE')">
+          Corrientes
+        </button>
+        <button
+          class="sl-seg-opt"
+          type="button"
+          [class.active]="filtroTipo === 'NO_CORRIENTE'"
+          (click)="cambiarFiltroTipo('NO_CORRIENTE')"
+        >
+          No corrientes
+        </button>
+      </div>
+
+      <div class="rango-fechas">
+        <input class="sl-input" type="date" [(ngModel)]="desde" (ngModelChange)="fechasPersonalizadas()" />
+        <span>—</span>
+        <input class="sl-input" type="date" [(ngModel)]="hasta" (ngModelChange)="fechasPersonalizadas()" />
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="sl-card sl-elev-sm">
+        <div class="sl-card-kicker">Corriente</div>
+        <div class="kpi-valor">{{ totalCorriente | money }}</div>
+        <div class="kpi-desc">alquiler, sueldos, servicios, mercadería</div>
+      </div>
+      <div class="sl-card sl-elev-sm">
+        <div class="sl-card-kicker">No corriente</div>
+        <div class="kpi-valor">{{ totalNoCorriente | money }}</div>
+        <div class="kpi-desc">reforma y equipamiento</div>
+      </div>
+      <div class="sl-card sl-elev-sm kpi-total">
+        <div class="sl-card-kicker">Total del período</div>
+        <div class="kpi-valor kpi-accent">{{ totalGeneral | money }}</div>
+        <div class="kpi-desc">{{ gastosTodos.length }} gastos cargados</div>
+      </div>
+    </div>
+
+    <div class="tabla-wrap">
+      <table class="sl-table">
+        <thead>
+          <tr>
+            <th class="col-desc">Descripción</th>
+            <th>Categoría</th>
+            <th>Medio de pago</th>
+            <th>Comprobante</th>
+            <th>Fecha</th>
+            <th class="col-num">Monto</th>
+            <th class="col-acciones"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (gasto of gastosFiltrados; track gasto.id) {
+            <tr>
+              <td class="col-desc">
+                <div class="gasto-descripcion">{{ gasto.descripcion }}</div>
+                @if (gasto.proveedor_nombre) {
+                  <div class="gasto-proveedor">{{ gasto.proveedor_nombre }}</div>
+                }
+              </td>
+              <td>
+                <span class="sl-tag" [class.no-corriente]="gasto.categoria_tipo === 'NO_CORRIENTE'">
+                  {{ gasto.categoria_nombre }}
+                </span>
+              </td>
+              <td class="col-medio">{{ medioLabel(gasto.medio_pago) }}</td>
+              <td class="col-comprobante">{{ gasto.comprobante_numero || '—' }}</td>
+              <td class="col-fecha">{{ gasto.fecha | date: 'dd/MM/yyyy' }}</td>
+              <td class="col-num">{{ gasto.monto | money }}</td>
+              <td class="col-acciones">
+                <div class="fila-acciones">
+                  <button class="sl-btn sl-btn-ghost" type="button" (click)="abrirEditar(gasto)" aria-label="Editar">
+                    <i class="ph ph-pencil-simple"></i>
+                  </button>
+                  <button class="sl-btn sl-btn-ghost fila-eliminar" type="button" (click)="confirmarEliminar(gasto)" aria-label="Eliminar">
+                    <i class="ph ph-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="tabla-vacia">No hay gastos en este rango.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="tabla-nota">Gasto es la única entidad con borrado físico: al eliminar, desaparece del balance.</p>
   </div>
-
-  <ion-segment [value]="filtroTipo" (ionChange)="cambiarFiltroTipo($any($event.detail.value))">
-    <ion-segment-button value="TODOS"><ion-label>Todos</ion-label></ion-segment-button>
-    <ion-segment-button value="CORRIENTE"><ion-label>Corrientes</ion-label></ion-segment-button>
-    <ion-segment-button value="NO_CORRIENTE"><ion-label>No corrientes</ion-label></ion-segment-button>
-  </ion-segment>
-
-  <h2 class="ion-margin-top">Corriente: ${{ totalCorriente.toFixed(2) }}</h2>
-  <h2>No corriente: ${{ totalNoCorriente.toFixed(2) }}</h2>
-  <h1>Total: ${{ totalGeneral.toFixed(2) }}</h1>
-
-  <ion-list class="ion-margin-top">
-    @for (gasto of gastosFiltrados; track gasto.id) {
-      <ion-item>
-        <ion-label>
-          <h2>{{ gasto.descripcion }}</h2>
-          <p>{{ gasto.categoria_nombre }} · {{ gasto.medio_pago }}</p>
-        </ion-label>
-        <ion-badge slot="end" [color]="gasto.categoria_tipo === 'NO_CORRIENTE' ? 'tertiary' : 'primary'">
-          ${{ gasto.monto }}
-        </ion-badge>
-        <ion-button slot="end" fill="clear" (click)="abrirEditar(gasto)">Editar</ion-button>
-        <ion-button slot="end" fill="clear" color="danger" (click)="confirmarEliminar(gasto)">Eliminar</ion-button>
-      </ion-item>
-    } @empty {
-      <ion-item>
-        <ion-label>No hay gastos en este rango.</ion-label>
-      </ion-item>
-    }
-  </ion-list>
-
-  <ion-button expand="block" (click)="abrirNuevo()">+ Nuevo gasto</ion-button>
-</ion-content>
+</div>

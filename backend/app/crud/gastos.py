@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.models.gasto import CategoriaGasto, Gasto
-from app.schemas.gasto import CategoriaGastoCreate, GastoCreate, GastoUpdate
+from app.schemas.gasto import CategoriaGastoCreate, CategoriaGastoUpdate, GastoCreate, GastoUpdate
 
 
 class NoEncontradoError(Exception):
@@ -125,3 +125,30 @@ async def crear_categoria(db: AsyncSession, datos: CategoriaGastoCreate) -> Cate
         raise ConflictoError("Ya existe una categoría de gasto con ese nombre") from exc
     await db.refresh(categoria)
     return categoria
+
+
+async def actualizar_categoria(db: AsyncSession, categoria_id: int, datos: CategoriaGastoUpdate) -> CategoriaGasto:
+    categoria = await db.get(CategoriaGasto, categoria_id)
+    if categoria is None:
+        raise NoEncontradoError()
+
+    categoria.nombre = datos.nombre
+    categoria.tipo = datos.tipo
+    categoria.descripcion = datos.descripcion
+    categoria.activo = datos.activo
+
+    try:
+        await db.commit()
+    except IntegrityError as exc:
+        await db.rollback()
+        raise ConflictoError("Ya existe una categoría de gasto con ese nombre") from exc
+    await db.refresh(categoria)
+    return categoria
+
+
+async def eliminar_categoria(db: AsyncSession, categoria_id: int) -> None:
+    categoria = await db.get(CategoriaGasto, categoria_id)
+    if categoria is None:
+        raise NoEncontradoError()
+    categoria.activo = False
+    await db.commit()

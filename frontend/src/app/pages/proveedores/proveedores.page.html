@@ -1,31 +1,74 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/stock"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Proveedores</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="page">
+  <header class="page-header">
+    <div class="page-header-titles">
+      <h1>Proveedores</h1>
+      <p>{{ cantidadActivos }} proveedores · {{ cantidadBaja }} dado{{ cantidadBaja === 1 ? '' : 's' }} de baja</p>
+    </div>
+    <div class="page-header-actions">
+      <button class="sl-btn sl-btn-primary" type="button" (click)="abrirNuevo()">
+        <i class="ph ph-plus"></i>
+        Nuevo proveedor
+      </button>
+    </div>
+  </header>
 
-<ion-content>
-  <ion-list>
-    @for (proveedor of proveedores; track proveedor.id) {
-      <ion-item>
-        <ion-label>
-          <h2>{{ proveedor.nombre }}</h2>
-          @if (proveedor.telefono || proveedor.email) {
-            <p>{{ proveedor.telefono }} {{ proveedor.telefono && proveedor.email ? '·' : '' }} {{ proveedor.email }}</p>
+  <div class="proveedores-body">
+    <div class="tabla-wrap">
+      <table class="sl-table">
+        <thead>
+          <tr>
+            <th class="col-proveedor">Proveedor</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th class="col-num">Artículos</th>
+            <th>Estado</th>
+            <th class="col-acciones"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of resumenes; track r.proveedor.id) {
+            <tr>
+              <td class="col-proveedor">
+                <div class="proveedor-cell">
+                  <div class="proveedor-avatar">{{ iniciales(r.proveedor.nombre) }}</div>
+                  <div>
+                    <div class="proveedor-nombre">{{ r.proveedor.nombre }}</div>
+                    <div class="proveedor-cuit">{{ r.proveedor.cuit ? 'CUIT ' + r.proveedor.cuit : '—' }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="col-contacto">{{ r.proveedor.telefono || '—' }}</td>
+              <td class="col-contacto">{{ r.proveedor.email || '—' }}</td>
+              <td class="col-num">{{ r.articulos }}</td>
+              <td>
+                <span class="sl-tag estado-chip" [class.activo]="r.proveedor.activo">
+                  {{ r.proveedor.activo ? 'Activo' : 'Dado de baja' }}
+                </span>
+              </td>
+              <td class="col-acciones">
+                <div class="fila-acciones">
+                  <button class="sl-btn sl-btn-ghost" type="button" (click)="abrirEditar(r.proveedor)" aria-label="Editar">
+                    <i class="ph ph-pencil-simple"></i>
+                  </button>
+                  <button
+                    class="sl-btn sl-btn-ghost fila-eliminar"
+                    type="button"
+                    (click)="confirmarEliminar(r.proveedor)"
+                    aria-label="Eliminar"
+                  >
+                    <i class="ph ph-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="tabla-vacia">No hay proveedores cargados todavía.</td>
+            </tr>
           }
-        </ion-label>
-        <ion-button slot="end" fill="clear" (click)="abrirEditar(proveedor)">Editar</ion-button>
-        <ion-button slot="end" fill="clear" color="danger" (click)="confirmarEliminar(proveedor)">Eliminar</ion-button>
-      </ion-item>
-    } @empty {
-      <ion-item>
-        <ion-label>No hay proveedores cargados todavía.</ion-label>
-      </ion-item>
-    }
-  </ion-list>
-
-  <ion-button expand="block" class="ion-margin" (click)="abrirNuevo()">+ Nuevo proveedor</ion-button>
-</ion-content>
+        </tbody>
+      </table>
+    </div>
+    <p class="tabla-nota">Los proveedores se dan de baja con soft delete (activo = false); nunca se borran.</p>
+  </div>
+</div>

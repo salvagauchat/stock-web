@@ -1,35 +1,168 @@
-/* Ionic usa --ion-background-color como fallback interno en varios
-   componentes (ion-content, ion-list, el contenido del accordion, etc.).
-   Pisando esta variable a nivel ion-menu, se hereda hacia todos los
-   componentes hijos (incluso los que tienen shadow DOM), así que no hace
-   falta forzar el fondo de cada uno por separado. */
-ion-menu {
-  --ion-background-color: #1e40af;
-  --ion-item-background: transparent;
-  --background: #1e40af;
+.shell {
+  display: grid;
+  grid-template-columns: 216px minmax(0, 1fr);
+  min-height: 100vh;
+  background: var(--sl-bg);
 }
 
-ion-menu ion-toolbar {
-  --background: #1e40af;
-  --color: #ffffff;
+.content-area {
+  position: relative;
+  min-width: 0;
 }
 
-ion-menu ion-content {
-  --background: #1e40af;
-  --color: #ffffff;
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 16px 12px;
+  background: var(--sl-sidebar);
+  border-right: 1px solid var(--sl-divider-section);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  font-family: var(--sl-font);
 }
 
-ion-menu ion-item {
-  --color: #ffffff;
-  --border-color: rgba(255, 255, 255, 0.15);
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 4px 8px 18px;
 }
 
-ion-menu ion-title.brand-title {
-  color: #ffffff;
+.sidebar-brand-mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  border: 1px solid var(--sl-accent);
+  display: grid;
+  place-items: center;
+  color: var(--sl-accent);
+  font-size: 15px;
 }
 
-ion-menu .menu-activo {
-  --background: rgba(255, 255, 255, 0.18);
-  --color: #ffffff;
-  font-weight: 600;
+.sidebar-brand-name {
+  font-size: 14.5px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--sl-text);
+}
+
+.sidebar-group-label {
+  font-size: 9.5px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: rgba(233, 233, 237, 0.32);
+  padding: 10px 8px 4px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  color: var(--sl-text);
+  text-decoration: none;
+  font-size: 13.5px;
+  cursor: pointer;
+  background: transparent;
+
+  i:first-child {
+    font-size: 16px;
+    width: 16px;
+    text-align: center;
+  }
+
+  &:hover {
+    background: rgba(233, 233, 237, 0.06);
+  }
+
+  &.active {
+    background: rgba(145, 132, 217, 0.13);
+    border-color: rgba(145, 132, 217, 0.35);
+    color: #c7c0f5;
+  }
+}
+
+.sidebar-item-caret {
+  margin-left: auto;
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+.sidebar-submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: 1px 0 3px 20px;
+  padding-left: 11px;
+  border-left: 1px solid rgba(233, 233, 237, 0.1);
+
+  a {
+    padding: 6px 8px;
+    font-size: 13px;
+    color: rgba(233, 233, 237, 0.6);
+    text-decoration: none;
+    border-radius: 6px;
+
+    &:hover {
+      color: var(--sl-text);
+    }
+
+    &.active {
+      color: var(--sl-accent-400);
+    }
+  }
+}
+
+.sidebar-spacer {
+  flex: 1;
+}
+
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 8px 4px;
+  border-top: 1px solid var(--sl-divider-section);
+  margin-top: 8px;
+}
+
+.avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--sl-neutral-2);
+  color: var(--sl-text);
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 500;
+  flex: none;
+}
+
+.sidebar-user-name {
+  font-size: 12.5px;
+  color: rgba(233, 233, 237, 0.7);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  color: rgba(233, 233, 237, 0.45);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 15px;
+  line-height: 1;
+
+  &:hover {
+    color: var(--sl-text);
+  }
 }

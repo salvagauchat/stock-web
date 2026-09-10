@@ -1,50 +1,45 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>{{ esEdicion ? 'Editar proveedor' : 'Nuevo proveedor' }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="cancelar()">Cerrar</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<div class="sl-dialog-content">
+  <div class="sl-dialog-title">{{ esEdicion ? 'Editar proveedor' : 'Nuevo proveedor' }}</div>
 
-<ion-content class="ion-padding">
-  <ion-item>
-    <ion-label position="stacked">Nombre</ion-label>
-    <ion-input [(ngModel)]="nombre" name="nombre" required></ion-input>
-  </ion-item>
+  <div class="sl-field">
+    <label for="nombre">Nombre</label>
+    <input id="nombre" class="sl-input" [(ngModel)]="nombre" name="nombre" required />
+  </div>
 
-  <ion-item>
-    <ion-label position="stacked">Teléfono</ion-label>
-    <ion-input [(ngModel)]="telefono" name="telefono"></ion-input>
-  </ion-item>
+  <div class="sl-field-row">
+    <div class="sl-field">
+      <label for="telefono">Teléfono</label>
+      <input id="telefono" class="sl-input" [(ngModel)]="telefono" name="telefono" />
+    </div>
+    <div class="sl-field">
+      <label for="email">Email</label>
+      <input id="email" class="sl-input" type="email" [(ngModel)]="email" name="email" />
+    </div>
+  </div>
 
-  <ion-item>
-    <ion-label position="stacked">Email</ion-label>
-    <ion-input type="email" [(ngModel)]="email" name="email"></ion-input>
-  </ion-item>
+  <div class="sl-field">
+    <label for="direccion">Dirección</label>
+    <input id="direccion" class="sl-input" [(ngModel)]="direccion" name="direccion" />
+  </div>
 
-  <ion-item>
-    <ion-label position="stacked">Dirección</ion-label>
-    <ion-input [(ngModel)]="direccion" name="direccion"></ion-input>
-  </ion-item>
+  <div class="sl-field">
+    <label for="cuit">CUIT</label>
+    <input id="cuit" class="sl-input" [(ngModel)]="cuit" name="cuit" />
+  </div>
 
-  <ion-item>
-    <ion-label position="stacked">CUIT</ion-label>
-    <ion-input [(ngModel)]="cuit" name="cuit"></ion-input>
-  </ion-item>
-
-  <ion-item>
-    <ion-label position="stacked">Notas</ion-label>
-    <ion-input [(ngModel)]="notas" name="notas"></ion-input>
-  </ion-item>
+  <div class="sl-field">
+    <label for="notas">Notas</label>
+    <input id="notas" class="sl-input" [(ngModel)]="notas" name="notas" />
+  </div>
 
   @if (error()) {
-    <ion-text color="danger">
-      <p>{{ error() }}</p>
-    </ion-text>
+    <p class="sl-form-error">{{ error() }}</p>
   }
 
-  <ion-button expand="block" class="ion-margin-top" (click)="guardar()" [disabled]="guardando()">
-    {{ guardando() ? 'Guardando...' : 'Guardar' }}
-  </ion-button>
-</ion-content>
+  <div class="sl-dialog-actions">
+    <button class="sl-btn sl-btn-secondary" type="button" (click)="cancelar()">Cancelar</button>
+    <button class="sl-btn sl-btn-primary" type="button" [disabled]="guardando()" (click)="guardar()">
+      {{ guardando() ? 'Guardando...' : 'Guardar' }}
+    </button>
+  </div>
+</div>

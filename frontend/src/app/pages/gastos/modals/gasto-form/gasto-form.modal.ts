@@ -1,21 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonInput,
-  IonItem,
-  IonLabel,
-  IonSelect,
-  IonSelectOption,
-  IonText,
-  IonTitle,
-  IonToolbar,
-  ModalController,
-} from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular/standalone';
 import { GastoService } from '../../../../core/services/gasto.service';
 import { ProveedorService } from '../../../../core/services/proveedor.service';
 import { MedioPago } from '../../../../models/config-medio-pago.model';
@@ -27,21 +13,7 @@ const MEDIOS_PAGO: MedioPago[] = ['EFECTIVO', 'DEBITO', 'CREDITO', 'TRANSFERENCI
 @Component({
   selector: 'app-gasto-form',
   standalone: true,
-  imports: [
-    FormsModule,
-    IonButton,
-    IonButtons,
-    IonContent,
-    IonHeader,
-    IonInput,
-    IonItem,
-    IonLabel,
-    IonSelect,
-    IonSelectOption,
-    IonText,
-    IonTitle,
-    IonToolbar,
-  ],
+  imports: [FormsModule],
   templateUrl: './gasto-form.modal.html',
 })
 export class GastoFormModal implements OnInit {

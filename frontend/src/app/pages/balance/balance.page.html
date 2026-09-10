@@ -1,113 +1,101 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title class="brand-title">Balance</ion-title>
-    <ion-buttons slot="end">
-      <ion-button class="logout-button" (click)="logout()">
-        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<div class="page">
+  <header class="page-header">
+    <div class="page-header-titles">
+      <h1>Balance</h1>
+      <p>Ingresos, egresos y ganancia bruta del período</p>
+    </div>
+  </header>
 
-<ion-content class="ion-padding">
-  <ion-segment [value]="periodo" (ionChange)="setPeriodo($any($event.detail.value))">
-    <ion-segment-button value="hoy"><ion-label>Hoy</ion-label></ion-segment-button>
-    <ion-segment-button value="semana"><ion-label>Semana</ion-label></ion-segment-button>
-    <ion-segment-button value="mes"><ion-label>Mes</ion-label></ion-segment-button>
-    <ion-segment-button value="anio"><ion-label>Año</ion-label></ion-segment-button>
-    <ion-segment-button value="personalizado"><ion-label>Personalizado</ion-label></ion-segment-button>
-  </ion-segment>
-
-  <div class="ion-margin-top" style="display:flex; gap:12px; flex-wrap:wrap;">
-    <ion-item style="flex:1; min-width:150px;">
-      <ion-label position="stacked">Desde</ion-label>
-      <ion-input type="date" [(ngModel)]="desde" (ionChange)="fechaPersonalizadaCambio()"></ion-input>
-    </ion-item>
-    <ion-item style="flex:1; min-width:150px;">
-      <ion-label position="stacked">Hasta</ion-label>
-      <ion-input type="date" [(ngModel)]="hasta" (ionChange)="fechaPersonalizadaCambio()"></ion-input>
-    </ion-item>
-  </div>
-
-  @if (balance) {
-    <hr class="balance-sep" />
-
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-      <div>
-        <h3>Ingresos</h3>
-        <h1>${{ balance.ingresos }}</h1>
+  <div class="balance-body">
+    <div class="filtros-row">
+      <div class="sl-seg">
+        <button class="sl-seg-opt" type="button" [class.active]="periodo === 'hoy'" (click)="setPeriodo('hoy')">Hoy</button>
+        <button class="sl-seg-opt" type="button" [class.active]="periodo === 'semana'" (click)="setPeriodo('semana')">Semana</button>
+        <button class="sl-seg-opt" type="button" [class.active]="periodo === 'mes'" (click)="setPeriodo('mes')">Mes</button>
+        <button class="sl-seg-opt" type="button" [class.active]="periodo === 'anio'" (click)="setPeriodo('anio')">Año</button>
       </div>
-      <div>
-        <h3>Egresos</h3>
-        <h1>${{ egresosTotales.toFixed(2) }}</h1>
-      </div>
-      <div>
-        <h3>Balance neto</h3>
-        <h1 [style.color]="balanceNeto >= 0 ? '#2dd36f' : '#eb445a'">${{ balanceNeto.toFixed(2) }}</h1>
-      </div>
-      <div>
-        <h3>Ganancia bruta</h3>
-        <h1>${{ balance.ganancia_bruta }} ({{ balance.margen_porcentaje }}%)</h1>
+      <div class="rango-fechas">
+        <input class="sl-input" type="date" [(ngModel)]="desde" (ngModelChange)="fechasPersonalizadas()" />
+        <span>—</span>
+        <input class="sl-input" type="date" [(ngModel)]="hasta" (ngModelChange)="fechasPersonalizadas()" />
       </div>
     </div>
 
-    <p>Gastos corrientes: ${{ balance.gastos_corrientes }} · Gastos no corrientes: ${{ balance.gastos_no_corrientes }}</p>
+    @if (balance) {
+      <div class="kpi-grid">
+        <div class="sl-card sl-elev-sm">
+          <div class="sl-card-kicker">Ingresos</div>
+          <div class="kpi-valor">{{ balance.ingresos | money }}</div>
+          <div class="kpi-desc">{{ balance.cantidad_ventas }} ventas · ticket {{ ticketPromedio | money }}</div>
+        </div>
+        <div class="sl-card sl-elev-sm">
+          <div class="sl-card-kicker">Egresos</div>
+          <div class="kpi-valor">{{ egresosTotales | money }}</div>
+          <div class="kpi-desc">corrientes + no corrientes</div>
+        </div>
+        <div class="sl-card sl-elev-sm kpi-total">
+          <div class="sl-card-kicker">Balance neto</div>
+          <div class="kpi-valor kpi-accent">{{ balanceNeto | money }}</div>
+          <div class="kpi-desc">ingresos − egresos</div>
+        </div>
+        <div class="sl-card sl-elev-sm">
+          <div class="sl-card-kicker">Ganancia bruta</div>
+          <div class="kpi-valor">{{ balance.ganancia_bruta | money }}</div>
+          <div class="kpi-desc">margen {{ balance.margen_porcentaje }}%</div>
+        </div>
+      </div>
 
-    <hr class="balance-sep" />
+      <div class="paneles-grid">
+        <div class="sl-card sl-elev-sm panel-evolucion">
+          <div class="panel-titulo">Evolución diaria</div>
+          <div class="chart-wrap">
+            <canvas #chartEvolucion></canvas>
+          </div>
+        </div>
 
-    <h3>Evolución diaria</h3>
-    <div style="position: relative; height: 250px;">
-      <canvas #chartEvolucion></canvas>
-    </div>
-
-    <hr class="balance-sep" />
-
-    <h3>Ingresos por medio de pago</h3>
-    <div style="position: relative; height: 250px;">
-      <canvas #chartMedios></canvas>
-    </div>
-
-    <hr class="balance-sep" />
-
-    <h3>Por medio de pago</h3>
-    <div style="overflow-x:auto;">
-      <table class="balance-tabla">
-        <thead>
-          <tr>
-            <th style="text-align:left;">Medio</th>
-            <th style="text-align:right;">Ingresos</th>
-            <th style="text-align:right;">Egresos</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (medio of mediosPago; track medio.key) {
-            <tr>
-              <td>{{ medio.label }}</td>
-              <td style="text-align:right;">${{ balance.ingresos_por_medio[medio.key] }}</td>
-              <td style="text-align:right;">${{ balance.egresos_por_medio[medio.key] }}</td>
-            </tr>
+        <div class="sl-card sl-elev-sm panel-topcats">
+          <div class="panel-titulo">Top 5 categorías más vendidas</div>
+          @for (c of balance.top_categorias; track c.categoria) {
+            <div class="topcat-row">
+              <div class="topcat-info">
+                <span>{{ c.categoria }}</span>
+                <span class="topcat-valor">{{ c.unidades_vendidas }} u. · {{ c.total_facturado | money }}</span>
+              </div>
+              <div class="topcat-bar"><div class="topcat-bar-fill" [style.width.%]="barraTop(c.unidades_vendidas)"></div></div>
+            </div>
+          } @empty {
+            <p class="topcat-vacio">No hay ventas en este período.</p>
           }
-        </tbody>
-      </table>
-    </div>
+        </div>
+      </div>
 
-    <hr class="balance-sep" />
-
-    <h3>Top 5 categorías más vendidas</h3>
-    <ion-list lines="full">
-      @for (c of balance.top_categorias; track c.categoria) {
-        <ion-item>
-          <ion-label>{{ c.categoria }}</ion-label>
-          <ion-label slot="end">{{ c.unidades_vendidas }} u. · ${{ c.total_facturado }}</ion-label>
-        </ion-item>
-      } @empty {
-        <ion-item>
-          <ion-label>No hay ventas en este período.</ion-label>
-        </ion-item>
-      }
-    </ion-list>
-  }
-</ion-content>
+      <div class="sl-card sl-elev-sm tabla-medios">
+        <div class="panel-titulo tabla-medios-titulo">Por medio de pago</div>
+        <div class="tabla-medios-wrap">
+          <table class="sl-table">
+            <thead>
+              <tr>
+                <th class="col-medio">Medio</th>
+                <th>Config.</th>
+                <th class="col-num">Ingresos</th>
+                <th class="col-num">Egresos</th>
+                <th class="col-num col-neto">Neto</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (medio of mediosPago; track medio.key) {
+                <tr>
+                  <td class="col-medio">{{ medio.label }}</td>
+                  <td class="col-config">{{ configPara(medio.key) }}</td>
+                  <td class="col-num">{{ balance.ingresos_por_medio[medio.key] | money }}</td>
+                  <td class="col-num col-egresos">{{ balance.egresos_por_medio[medio.key] | money }}</td>
+                  <td class="col-num col-neto">{{ netoPorMedio(medio.key) | money }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -14,6 +14,13 @@ class CategoriaGastoCreate(BaseModel):
     descripcion: Optional[str] = None
 
 
+class CategoriaGastoUpdate(BaseModel):
+    nombre: str
+    tipo: TipoGastoLiteral
+    descripcion: Optional[str] = None
+    activo: bool = True
+
+
 class CategoriaGastoOut(BaseModel):
     id: int
     nombre: str

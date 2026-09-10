@@ -1,58 +1,118 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title class="brand-title">Ventas</ion-title>
-    <ion-buttons slot="end">
-      <ion-button class="logout-button" (click)="logout()">
-        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-  <ion-toolbar>
-    <ion-searchbar [(ngModel)]="busqueda" (ionInput)="aplicarFiltro()" placeholder="Buscar por nombre, marca o ID"></ion-searchbar>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content>
-  <ion-list>
-    @for (producto of productosFiltrados; track producto.id) {
-      <ion-item button [class.en-carrito]="estaEnCarrito(producto.id)" (click)="seleccionarProducto(producto)">
-        <ion-label>
-          <h2>#{{ producto.id }} · {{ producto.nombre }}</h2>
-          <p>${{ producto.precio_venta }} · Stock: {{ producto.stock_total }}</p>
-        </ion-label>
-      </ion-item>
-    } @empty {
-      <ion-item>
-        <ion-label>No hay productos con stock disponible.</ion-label>
-      </ion-item>
-    }
-  </ion-list>
-
-  @if (carrito.length > 0) {
-    <h3 class="ion-padding-start ion-margin-top">Carrito</h3>
-    <ion-list>
-      @for (item of carrito; track item.varianteId) {
-        <ion-item>
-          <ion-label>
-            <h3>{{ item.productoNombre }} ({{ item.etiquetaVariante }})</h3>
-            <p>${{ item.precioUnitario }} c/u</p>
-          </ion-label>
-          <ion-button slot="end" fill="clear" (click)="decrementar(item)">-</ion-button>
-          <ion-label slot="end">{{ item.cantidad }}</ion-label>
-          <ion-button slot="end" fill="clear" (click)="incrementar(item)">+</ion-button>
-          <ion-badge slot="end">${{ (item.cantidad * item.precioUnitario).toFixed(2) }}</ion-badge>
-        </ion-item>
-      }
-    </ion-list>
-
-    <div class="ion-padding">
-      <h2>Subtotal: ${{ subtotal.toFixed(2) }}</h2>
-      <ion-button expand="block" (click)="cobrar()" [disabled]="procesando()">
-        {{ procesando() ? 'Procesando...' : 'Cobrar' }}
-      </ion-button>
+<div class="page">
+  <header class="page-header">
+    <div class="page-header-titles">
+      <h1>Ventas</h1>
+      <p>Buscá por nombre, marca o ID y elegí talle y color</p>
     </div>
-  }
-</ion-content>
+    <div class="page-header-actions">
+      <button class="sl-btn sl-btn-secondary" type="button" (click)="irAHistorial()">
+        <i class="ph ph-clock-counter-clockwise"></i>
+        Historial
+      </button>
+    </div>
+  </header>
+
+  <div class="ventas-layout">
+    <section class="productos-panel">
+      <div class="search-row">
+        <div class="search-input">
+          <i class="ph ph-magnifying-glass"></i>
+          <input
+            class="sl-input"
+            placeholder="Buscar por nombre, marca o ID"
+            [(ngModel)]="busqueda"
+            (ngModelChange)="aplicarFiltro()"
+          />
+        </div>
+        <span class="result-count">{{ productosFiltrados.length }} con stock</span>
+      </div>
+
+      <div class="cat-chips">
+        <button class="chip" type="button" [class.active]="categoriaFiltro() === null" (click)="seleccionarCategoria(null)">
+          Todas
+        </button>
+        @for (cat of categorias; track cat.id) {
+          <button
+            class="chip"
+            type="button"
+            [class.active]="categoriaFiltro() === cat.id"
+            (click)="seleccionarCategoria(cat.id)"
+          >
+            {{ cat.nombre }}
+          </button>
+        }
+      </div>
+
+      <div class="producto-list">
+        @for (producto of productosFiltrados; track producto.id) {
+          <button class="producto-row" type="button" (click)="seleccionarProducto(producto)">
+            <div class="producto-thumb" [style.background]="colorCategoria(producto.categoria_id)">
+              {{ inicial(producto.nombre) }}
+            </div>
+            <div class="producto-info">
+              <div class="producto-nombre"><span class="producto-id">#{{ producto.id }}</span>{{ producto.nombre }}</div>
+              <div class="producto-meta">{{ producto.marca || 'Sin marca' }} · {{ producto.categoria_nombre || 'Sin categoría' }}</div>
+            </div>
+            <div class="producto-precio">
+              <div class="precio-venta">{{ (producto.precio_venta) | money }}</div>
+              <div class="precio-costo">costo {{ (producto.precio_costo) | money }}</div>
+            </div>
+            <span class="sl-tag sl-tag-stock">{{ producto.stock_total }} u.</span>
+          </button>
+        } @empty {
+          <div class="producto-list-empty">No hay productos con stock disponible.</div>
+        }
+      </div>
+    </section>
+
+    <aside class="carrito-panel">
+      <div class="carrito-header">
+        <i class="ph ph-shopping-cart"></i>
+        <span>Carrito</span>
+        @if (carrito.length > 0) {
+          <button class="sl-btn sl-btn-ghost carrito-vaciar" type="button" (click)="vaciarCarrito()">Vaciar</button>
+        }
+      </div>
+
+      <div class="carrito-items">
+        @if (carrito.length === 0) {
+          <div class="carrito-vacio">
+            <i class="ph ph-basket"></i>
+            <p>Tocá un producto de la lista<br />y elegí talle y color.</p>
+          </div>
+        }
+        @for (item of carrito; track item.varianteId) {
+          <div class="carrito-item">
+            <div class="carrito-item-info">
+              <div class="carrito-item-nombre">{{ item.productoNombre }}</div>
+              <div class="carrito-item-meta">{{ item.etiquetaVariante }} · {{ (item.precioUnitario) | money }} c/u</div>
+            </div>
+            <div class="carrito-stepper">
+              <button class="sl-btn sl-btn-secondary stepper-btn" type="button" (click)="decrementar(item)">−</button>
+              <span class="stepper-qty">{{ item.cantidad }}</span>
+              <button class="sl-btn sl-btn-secondary stepper-btn" type="button" (click)="incrementar(item)">+</button>
+            </div>
+            <div class="carrito-item-total">{{ (item.cantidad * item.precioUnitario) | money }}</div>
+          </div>
+        }
+      </div>
+
+      <div class="carrito-footer">
+        <div class="carrito-subtotal-row">
+          <span>Subtotal</span>
+          <span class="carrito-subtotal-valor">{{ (subtotal) | money }}</span>
+        </div>
+        <p class="carrito-nota">El total definitivo depende del medio de pago: el backend recalcula descuentos y recargos.</p>
+        <button
+          class="sl-btn sl-btn-primary sl-btn-block cobrar-btn"
+          type="button"
+          [disabled]="carrito.length === 0 || procesando()"
+          (click)="cobrar()"
+        >
+          <i class="ph ph-check-circle"></i>
+          {{ procesando() ? 'Procesando...' : 'Cobrar' }}
+        </button>
+      </div>
+    </aside>
+  </div>
+</div>

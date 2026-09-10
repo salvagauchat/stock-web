@@ -20,6 +20,7 @@ export interface BalanceDiarioItem {
 
 export interface Balance {
   ingresos: string;
+  cantidad_ventas: number;
   gastos_corrientes: string;
   gastos_no_corrientes: string;
   ganancia_bruta: string;

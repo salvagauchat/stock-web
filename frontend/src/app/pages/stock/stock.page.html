@@ -1,49 +1,131 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title class="brand-title">Stock</ion-title>
-    <ion-buttons slot="end">
-      <ion-button class="logout-button" (click)="logout()">
-        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-  <ion-toolbar>
-    <ion-searchbar [(ngModel)]="busqueda" (ionInput)="aplicarFiltro()" placeholder="Buscar por nombre, marca o ID"></ion-searchbar>
-  </ion-toolbar>
-</ion-header>
+<div class="page">
+  <header class="page-header">
+    <div class="page-header-titles">
+      <h1>Stock</h1>
+      <p>Productos activos con sus variantes</p>
+    </div>
+    <div class="page-header-actions">
+      <button class="sl-btn sl-btn-primary" type="button" (click)="abrirNuevo()">
+        <i class="ph ph-plus"></i>
+        Nuevo producto
+      </button>
+    </div>
+  </header>
 
-<ion-content>
-  <ion-list>
-    @for (producto of productosFiltrados; track producto.id) {
-      <ion-item>
-        <ion-label>
-          <h2>#{{ producto.id }} · {{ producto.nombre }}</h2>
-          <p>
-            {{ producto.categoria_nombre || 'Sin categoría' }}
-            @if (producto.proveedor_nombre) {
-              · {{ producto.proveedor_nombre }}
-            }
-          </p>
-        </ion-label>
-        <ion-badge
-          slot="end"
-          [color]="producto.stock_total === 0 ? 'danger' : producto.stock_total < 5 ? 'warning' : 'success'"
-        >
-          Stock: {{ producto.stock_total }}
-        </ion-badge>
-        <ion-button slot="end" fill="clear" (click)="abrirVariantes(producto)">Variantes</ion-button>
-        <ion-button slot="end" fill="clear" (click)="abrirEditar(producto)">Editar</ion-button>
-        <ion-button slot="end" fill="clear" color="danger" (click)="confirmarEliminar(producto)">Eliminar</ion-button>
-      </ion-item>
-    } @empty {
-      <ion-item>
-        <ion-label>No hay productos cargados todavía.</ion-label>
-      </ion-item>
-    }
-  </ion-list>
+  <div class="stock-body">
+    <div class="filtros-row">
+      <div class="search-input">
+        <i class="ph ph-magnifying-glass"></i>
+        <input
+          class="sl-input"
+          placeholder="Buscar por nombre, marca o ID"
+          [(ngModel)]="busqueda"
+          (ngModelChange)="aplicarFiltro()"
+        />
+      </div>
+      <select class="sl-input filtro-categoria" [(ngModel)]="categoriaFiltro" (ngModelChange)="aplicarFiltro()">
+        <option [ngValue]="null">Todas las categorías</option>
+        @for (cat of categorias; track cat.id) {
+          <option [ngValue]="cat.id">{{ cat.nombre }}</option>
+        }
+      </select>
+      <button class="sl-btn sl-btn-secondary" type="button" [class.active]="soloStockBajo" (click)="toggleStockBajo()">
+        <i class="ph ph-warning"></i>
+        Sólo stock bajo
+      </button>
+    </div>
 
-  <ion-button expand="block" class="ion-margin" (click)="abrirNuevo()">+ Nuevo producto</ion-button>
-</ion-content>
+    <div class="kpi-grid">
+      <div class="sl-card sl-elev-sm">
+        <div class="sl-card-kicker">Artículos activos</div>
+        <div class="kpi-valor">{{ kpiArticulos }}</div>
+      </div>
+      <div class="sl-card sl-elev-sm">
+        <div class="sl-card-kicker">Variantes</div>
+        <div class="kpi-valor">{{ kpiVariantes }}</div>
+      </div>
+      <div class="sl-card sl-elev-sm">
+        <div class="sl-card-kicker">Valor de inventario</div>
+        <div class="kpi-valor kpi-nowrap">{{ kpiValorInventario | money }}</div>
+      </div>
+      <div class="sl-card sl-elev-sm">
+        <div class="sl-card-kicker">Bajo mínimo</div>
+        <div class="kpi-valor kpi-accent">{{ kpiBajoMinimo }}</div>
+      </div>
+    </div>
+
+    <div class="tabla-wrap">
+      <table class="sl-table">
+        <thead>
+          <tr>
+            <th class="col-producto">Producto</th>
+            <th>Categoría</th>
+            <th>Proveedor</th>
+            <th class="col-num">Costo</th>
+            <th class="col-num">Venta</th>
+            <th class="col-num">Margen</th>
+            <th class="col-num">Stock</th>
+            <th class="col-acciones"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (producto of productosFiltrados; track producto.id) {
+            <tr>
+              <td class="col-producto">
+                <div class="producto-cell">
+                  <div class="producto-thumb" [style.background]="colorCategoria(producto.categoria_id)">
+                    {{ inicial(producto.nombre) }}
+                  </div>
+                  <div class="producto-cell-info">
+                    <div class="producto-cell-nombre">{{ producto.nombre }} · {{ producto.marca || 'Sin marca' }}</div>
+                    <div class="variante-chips">
+                      @for (v of producto.variantes; track v.id) {
+                        <span class="variante-chip" [class.bajo-minimo]="v.stock_actual <= v.stock_minimo">
+                          {{ etiqueta(v) }} · {{ v.stock_actual }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="sl-tag sl-tag-neutral">{{ producto.categoria_nombre || 'Sin categoría' }}</span></td>
+              <td class="col-proveedor">{{ producto.proveedor_nombre || '—' }}</td>
+              <td class="col-num col-costo">{{ producto.precio_costo | money }}</td>
+              <td class="col-num">{{ producto.precio_venta | money }}</td>
+              <td class="col-num col-margen">{{ margen(producto) }}%</td>
+              <td class="col-num">
+                <span
+                  class="sl-tag stock-chip"
+                  [class.stock-bajo]="productoTieneStockBajo(producto)"
+                  [class.stock-cero]="producto.stock_total === 0"
+                >
+                  {{ producto.stock_total }} u.
+                </span>
+              </td>
+              <td class="col-acciones">
+                <div class="fila-acciones">
+                  <button class="sl-btn sl-btn-ghost" type="button" (click)="abrirVariantes(producto)" aria-label="Variantes">
+                    <i class="ph ph-list-bullets"></i>
+                  </button>
+                  <button class="sl-btn sl-btn-ghost" type="button" (click)="abrirEditar(producto)" aria-label="Editar">
+                    <i class="ph ph-pencil-simple"></i>
+                  </button>
+                  <button class="sl-btn sl-btn-ghost fila-eliminar" type="button" (click)="confirmarEliminar(producto)" aria-label="Eliminar">
+                    <i class="ph ph-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="tabla-vacia">No hay productos cargados todavía.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="tabla-nota">
+      El stock sólo se mueve por movimiento_stock — las variantes se editan desde el gestor de variantes de cada producto.
+    </p>
+  </div>
+</div>

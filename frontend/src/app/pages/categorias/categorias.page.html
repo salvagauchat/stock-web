@@ -1,31 +1,44 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/stock"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Categorías</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="page">
+  <header class="page-header">
+    <div class="page-header-titles">
+      <h1>Categorías</h1>
+      <p>Agrupan el catálogo y alimentan el top del balance</p>
+    </div>
+  </header>
 
-<ion-content>
-  <ion-list>
-    @for (categoria of categorias; track categoria.id) {
-      <ion-item>
-        <ion-label>
-          <h2>{{ categoria.nombre }}</h2>
-          @if (categoria.descripcion) {
-            <p>{{ categoria.descripcion }}</p>
-          }
-        </ion-label>
-        <ion-button slot="end" fill="clear" (click)="abrirEditar(categoria)">Editar</ion-button>
-        <ion-button slot="end" fill="clear" color="danger" (click)="confirmarEliminar(categoria)">Eliminar</ion-button>
-      </ion-item>
-    } @empty {
-      <ion-item>
-        <ion-label>No hay categorías cargadas todavía.</ion-label>
-      </ion-item>
+  <div class="categorias-body">
+    <div class="categorias-grid">
+      @for (r of resumenes; track r.categoria.id) {
+        <div class="categoria-card sl-elev-sm" (click)="abrirEditar(r.categoria)">
+          <div class="categoria-card-top">
+            <div class="categoria-mark"><i class="ph" [class]="icono(r.categoria)"></i></div>
+            <div class="categoria-info">
+              <div class="categoria-nombre">{{ r.categoria.nombre }}</div>
+              <div class="categoria-meta">{{ r.count }} artículos · {{ r.unidades }} u.</div>
+            </div>
+            <button
+              class="categoria-menu"
+              type="button"
+              (click)="$event.stopPropagation(); confirmarEliminar(r.categoria)"
+              aria-label="Eliminar categoría"
+            >
+              <i class="ph ph-dots-three-vertical"></i>
+            </button>
+          </div>
+          <div class="categoria-divider"></div>
+          <div class="categoria-row"><span>Valor en stock</span><span class="categoria-valor">{{ r.valor | money }}</span></div>
+          <div class="categoria-row"><span>Margen promedio</span><span class="categoria-valor">{{ r.margen }}%</span></div>
+          <div class="categoria-bar"><div class="categoria-bar-fill" [style.width.%]="barraAncho(r.margen)"></div></div>
+        </div>
+      }
+      <button class="categoria-card categoria-card-nueva" type="button" (click)="abrirNueva()">
+        <i class="ph ph-plus"></i>
+        Nueva categoría
+      </button>
+    </div>
+
+    @if (resumenes.length === 0 && !cargando()) {
+      <p class="categorias-vacio">No hay categorías cargadas todavía.</p>
     }
-  </ion-list>
-
-  <ion-button expand="block" class="ion-margin" (click)="abrirNueva()">+ Nueva categoría</ion-button>
-</ion-content>
+  </div>
+</div>

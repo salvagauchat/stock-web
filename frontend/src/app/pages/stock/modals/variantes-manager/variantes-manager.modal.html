@@ -1,57 +1,81 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Variantes — {{ productoNombre }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="cerrar()">Cerrar</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<div class="sl-dialog-content variantes-dialog">
+  <div class="dialog-header">
+    <div class="sl-dialog-title">Variantes — {{ productoNombre }}</div>
+    <button class="sl-btn sl-btn-secondary" type="button" (click)="cerrar()">Cerrar</button>
+  </div>
 
-<ion-content class="ion-padding">
-  <ion-list>
-    @for (v of variantes; track v.id) {
-      <ion-item>
-        <ion-label>
-          <h2>{{ etiqueta(v) }}</h2>
-          <p>Mínimo: {{ v.stock_minimo }} @if (v.sku) { · SKU: {{ v.sku }} }</p>
-        </ion-label>
-        <ion-badge slot="end" [color]="badgeColor(v)">{{ v.stock_actual }}</ion-badge>
-      </ion-item>
-      <div class="ion-padding-bottom" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
-        <ion-button size="small" fill="outline" (click)="ajustarStock(v)">Ajustar stock</ion-button>
-        <ion-button size="small" fill="outline" (click)="editarMinimo(v)">Editar mínimo</ion-button>
-        <ion-button size="small" fill="outline" color="danger" (click)="eliminar(v)">Eliminar</ion-button>
+  @if (cargando()) {
+    <p class="sl-dialog-body">Cargando variantes...</p>
+  } @else {
+    <div class="variantes-list">
+      @for (fila of filas; track fila.variante.id) {
+        <div class="variante-row">
+          <span class="variante-swatch" [style.background]="swatch(fila.variante.color)"></span>
+          <div class="variante-etiqueta">
+            <div>{{ etiqueta(fila.variante) }}</div>
+            @if (fila.variante.sku) {
+              <div class="variante-sku">SKU {{ fila.variante.sku }}</div>
+            }
+          </div>
+
+          <div class="variante-campo">
+            <label>Stock</label>
+            <div class="variante-campo-inline">
+              <input class="sl-input" type="number" min="0" [(ngModel)]="fila.stockInput" [name]="'stock' + fila.variante.id" />
+              @if (fila.stockInput !== fila.variante.stock_actual) {
+                <button class="sl-btn sl-btn-ghost" type="button" (click)="guardarStock(fila)" aria-label="Guardar stock">
+                  <i class="ph ph-check"></i>
+                </button>
+              }
+            </div>
+            @if (fila.stockInput !== fila.variante.stock_actual) {
+              <input
+                class="sl-input variante-motivo"
+                type="text"
+                placeholder="Motivo (opcional)"
+                [(ngModel)]="fila.motivo"
+                [name]="'motivo' + fila.variante.id"
+              />
+            }
+          </div>
+
+          <div class="variante-campo">
+            <label>Mínimo</label>
+            <div class="variante-campo-inline">
+              <input class="sl-input" type="number" min="0" [(ngModel)]="fila.minimoInput" [name]="'minimo' + fila.variante.id" />
+              @if (fila.minimoInput !== fila.variante.stock_minimo) {
+                <button class="sl-btn sl-btn-ghost" type="button" (click)="guardarMinimo(fila)" aria-label="Guardar mínimo">
+                  <i class="ph ph-check"></i>
+                </button>
+              }
+            </div>
+          </div>
+
+          <button class="sl-btn sl-btn-ghost variante-eliminar" type="button" (click)="eliminar(fila)" aria-label="Eliminar variante">
+            <i class="ph ph-trash"></i>
+          </button>
+        </div>
+      } @empty {
+        <p class="sl-dialog-body">Este producto todavía no tiene variantes.</p>
+      }
+    </div>
+
+    <div class="nueva-variante">
+      <div class="sl-dialog-title nueva-variante-title">Agregar variante</div>
+      <div class="nueva-variante-campos">
+        <input class="sl-input" placeholder="Talle" [(ngModel)]="nuevoTalle" name="nuevoTalle" />
+        <input class="sl-input" placeholder="Color" [(ngModel)]="nuevoColor" name="nuevoColor" />
+        <input class="sl-input" placeholder="SKU (opcional)" [(ngModel)]="nuevoSku" name="nuevoSku" />
+        <input class="sl-input" type="number" min="0" placeholder="Stock inicial" [(ngModel)]="nuevoStockInicial" name="nuevoStockInicial" />
+        <button class="sl-btn sl-btn-primary" type="button" (click)="agregar()">
+          <i class="ph ph-plus"></i>
+          Agregar
+        </button>
       </div>
-    } @empty {
-      <ion-item>
-        <ion-label>Este producto todavía no tiene variantes.</ion-label>
-      </ion-item>
+    </div>
+
+    @if (error()) {
+      <p class="sl-form-error">{{ error() }}</p>
     }
-  </ion-list>
-
-  <h3>Agregar variante</h3>
-  <ion-item>
-    <ion-label position="stacked">Talle</ion-label>
-    <ion-input [(ngModel)]="nuevoTalle" name="nuevoTalle"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-label position="stacked">Color</ion-label>
-    <ion-input [(ngModel)]="nuevoColor" name="nuevoColor"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-label position="stacked">SKU (opcional)</ion-label>
-    <ion-input [(ngModel)]="nuevoSku" name="nuevoSku"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-label position="stacked">Stock inicial</ion-label>
-    <ion-input type="number" [(ngModel)]="nuevoStockInicial" name="nuevoStockInicial"></ion-input>
-  </ion-item>
-
-  @if (error()) {
-    <ion-text color="danger">
-      <p>{{ error() }}</p>
-    </ion-text>
   }
-
-  <ion-button expand="block" class="ion-margin-top" (click)="agregar()">+ Agregar variante</ion-button>
-</ion-content>
+</div>

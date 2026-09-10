@@ -1,21 +1,18 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>{{ productoNombre }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="cancelar()">Cerrar</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<div class="sl-dialog-content">
+  <div class="sl-dialog-title">{{ productoNombre }}</div>
+  <div class="sl-dialog-body">Elegí la variante que se lleva el cliente.</div>
 
-<ion-content>
-  <ion-list>
+  <div class="variante-list">
     @for (v of variantes; track v.id) {
-      <ion-item button (click)="elegir(v)">
-        <ion-label>
-          <h2>{{ etiqueta(v) }}</h2>
-          <p>Stock disponible: {{ v.stock_actual }}</p>
-        </ion-label>
-      </ion-item>
+      <button class="variante-opt" type="button" (click)="elegir(v)">
+        <span class="variante-swatch" [style.background]="swatch(v)"></span>
+        <span class="variante-etiqueta">{{ etiqueta(v) }}</span>
+        <span class="variante-stock">{{ v.stock_actual }} en stock</span>
+      </button>
     }
-  </ion-list>
-</ion-content>
+  </div>
+
+  <div class="sl-dialog-actions">
+    <button class="sl-btn sl-btn-secondary" type="button" (click)="cancelar()">Cancelar</button>
+  </div>
+</div>

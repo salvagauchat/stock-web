@@ -1,38 +1,14 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonInput,
-  IonItem,
-  IonLabel,
-  IonText,
-  IonTitle,
-  IonToolbar,
-  ModalController,
-} from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular/standalone';
 import { ProveedorService } from '../../../../core/services/proveedor.service';
 import { Proveedor } from '../../../../models/proveedor.model';
 
 @Component({
   selector: 'app-proveedor-form',
   standalone: true,
-  imports: [
-    FormsModule,
-    IonButton,
-    IonButtons,
-    IonContent,
-    IonHeader,
-    IonInput,
-    IonItem,
-    IonLabel,
-    IonText,
-    IonTitle,
-    IonToolbar,
-  ],
+  imports: [FormsModule],
   templateUrl: './proveedor-form.modal.html',
 })
 export class ProveedorFormModal implements OnInit {

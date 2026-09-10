@@ -106,6 +106,8 @@ ng serve          # http://localhost:4200, apunta a environment.ts (apiUrl: loca
 ng build          # build de producción, usa environment.prod.ts vía fileReplacements en angular.json
 ```
 
+**Tests**: no hay suite de tests todavía (ni backend ni frontend, más allá del `app.spec.ts` default que deja `ng new`) — la verificación de cada módulo se hizo manual, con `curl` en el backend y probando en el navegador en el frontend. No asumir que existen tests para correr.
+
 ## Estado del proyecto
 
 Módulos completos y verificados end-to-end (backend probado con `curl`, frontend probado en el navegador): **login** (con rate limit), **stock** (productos + variantes talle/color + categorías + proveedores), **ventas** (carrito, cobro simple/mixto, historial, anulación), **gastos** (con categorías corriente/no-corriente), **balance** (dashboard con gráficos, top de categorías más vendidas, tabla por medio de pago). Navegación por menú lateral, marca "StockLocal" en tipografía Poppins.

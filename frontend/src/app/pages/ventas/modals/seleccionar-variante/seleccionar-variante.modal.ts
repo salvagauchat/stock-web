@@ -1,35 +1,25 @@
 import { Component, Input } from '@angular/core';
-import {
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonTitle,
-  IonToolbar,
-  ModalController,
-} from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular/standalone';
 import { VarianteProducto } from '../../../../models/producto.model';
+import { etiquetaVariante, swatchColor } from '../../../../shared/presentacion';
 
 @Component({
   selector: 'app-seleccionar-variante',
   standalone: true,
-  imports: [IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonTitle, IonToolbar],
+  imports: [],
   templateUrl: './seleccionar-variante.modal.html',
+  styleUrl: './seleccionar-variante.modal.scss',
 })
 export class SeleccionarVarianteModal {
   @Input() productoNombre = '';
   @Input() variantes: VarianteProducto[] = [];
 
+  readonly etiqueta = etiquetaVariante;
+
   constructor(private modalCtrl: ModalController) {}
 
-  etiqueta(v: VarianteProducto): string {
-    if (!v.talle && !v.color) {
-      return 'General';
-    }
-    return [v.talle, v.color].filter(Boolean).join(' / ');
+  swatch(v: VarianteProducto): string {
+    return swatchColor(v.color);
   }
 
   elegir(variante: VarianteProducto) {

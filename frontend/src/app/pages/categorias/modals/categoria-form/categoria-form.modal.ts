@@ -1,38 +1,14 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonInput,
-  IonItem,
-  IonLabel,
-  IonText,
-  IonTitle,
-  IonToolbar,
-  ModalController,
-} from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular/standalone';
 import { CategoriaService } from '../../../../core/services/categoria.service';
 import { Categoria } from '../../../../models/categoria.model';
 
 @Component({
   selector: 'app-categoria-form',
   standalone: true,
-  imports: [
-    FormsModule,
-    IonButton,
-    IonButtons,
-    IonContent,
-    IonHeader,
-    IonInput,
-    IonItem,
-    IonLabel,
-    IonText,
-    IonTitle,
-    IonToolbar,
-  ],
+  imports: [FormsModule],
   templateUrl: './categoria-form.modal.html',
 })
 export class CategoriaFormModal implements OnInit {

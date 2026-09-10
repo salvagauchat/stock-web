@@ -1,28 +1,16 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import {
-  IonBadge,
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonMenuButton,
-  IonSearchbar,
-  IonTitle,
-  IonToolbar,
-  ModalController,
-  ToastController,
-} from '@ionic/angular/standalone';
-import { AuthService } from '../../core/services/auth.service';
+import { ModalController, ToastController } from '@ionic/angular/standalone';
+import { CategoriaService } from '../../core/services/categoria.service';
 import { ProductoService } from '../../core/services/producto.service';
 import { VentaService } from '../../core/services/venta.service';
+import { Categoria } from '../../models/categoria.model';
 import { Producto } from '../../models/producto.model';
 import { PagoCreate, VentaCreate } from '../../models/venta.model';
+import { colorCategoria, etiquetaVariante, inicial } from '../../shared/presentacion';
+import { MoneyPipe } from '../../shared/pipes/money.pipe';
 import { ComprobanteModal } from './modals/comprobante/comprobante.modal';
 import { PagoModal } from './modals/pago/pago.modal';
 import { SeleccionarVarianteModal } from './modals/seleccionar-variante/seleccionar-variante.modal';
@@ -40,42 +28,31 @@ interface ItemCarrito {
 @Component({
   selector: 'app-ventas',
   standalone: true,
-  imports: [
-    FormsModule,
-    IonBadge,
-    IonButton,
-    IonButtons,
-    IonContent,
-    IonHeader,
-    IonIcon,
-    IonItem,
-    IonLabel,
-    IonList,
-    IonMenuButton,
-    IonSearchbar,
-    IonTitle,
-    IonToolbar,
-  ],
+  imports: [FormsModule, MoneyPipe],
   templateUrl: './ventas.page.html',
   styleUrl: './ventas.page.scss',
 })
 export class VentasPage implements OnInit {
   productos: Producto[] = [];
   productosFiltrados: Producto[] = [];
+  categorias: Categoria[] = [];
   busqueda = '';
+  categoriaFiltro = signal<number | null>(null);
   carrito: ItemCarrito[] = [];
   cargando = signal(false);
   procesando = signal(false);
 
   constructor(
     private productoSvc: ProductoService,
+    private categoriaSvc: CategoriaService,
     private ventaSvc: VentaService,
-    private auth: AuthService,
     private modalCtrl: ModalController,
     private toastCtrl: ToastController,
+    private router: Router,
   ) {}
 
   ngOnInit() {
+    this.categoriaSvc.listar().subscribe((categorias) => (this.categorias = categorias));
     this.cargar();
   }
 
@@ -93,29 +70,32 @@ export class VentasPage implements OnInit {
 
   aplicarFiltro() {
     const termino = this.busqueda.trim().toLowerCase();
-    this.productosFiltrados = !termino
-      ? this.productos
-      : this.productos.filter(
-          (p) =>
-            p.id.toString() === termino ||
-            [p.nombre, p.marca].some((campo) => campo?.toLowerCase().includes(termino)),
-        );
+    const categoriaId = this.categoriaFiltro();
+    this.productosFiltrados = this.productos.filter((p) => {
+      const matchTexto =
+        !termino || p.id.toString() === termino || [p.nombre, p.marca].some((campo) => campo?.toLowerCase().includes(termino));
+      const matchCategoria = categoriaId === null || p.categoria_id === categoriaId;
+      return matchTexto && matchCategoria;
+    });
   }
 
-  estaEnCarrito(productoId: number): boolean {
-    return this.carrito.some((item) => item.productoId === productoId);
+  seleccionarCategoria(id: number | null) {
+    this.categoriaFiltro.set(id);
+    this.aplicarFiltro();
+  }
+
+  readonly colorCategoria = colorCategoria;
+  readonly inicial = inicial;
+
+  irAHistorial() {
+    this.router.navigateByUrl('/historial');
   }
 
   get subtotal(): number {
     return this.carrito.reduce((acc, item) => acc + item.cantidad * item.precioUnitario, 0);
   }
 
-  etiqueta(v: { talle: string | null; color: string | null }): string {
-    if (!v.talle && !v.color) {
-      return 'General';
-    }
-    return [v.talle, v.color].filter(Boolean).join(' / ');
-  }
+  readonly etiqueta = etiquetaVariante;
 
   async seleccionarProducto(producto: Producto) {
     const detalle = await firstValueFrom(this.productoSvc.obtener(producto.id));
@@ -134,6 +114,7 @@ export class VentasPage implements OnInit {
     const modal = await this.modalCtrl.create({
       component: SeleccionarVarianteModal,
       componentProps: { productoNombre: detalle.nombre, variantes: variantesConStock },
+      cssClass: ['sl-dialog-modal', 'sl-dialog-modal--variante'],
     });
     await modal.present();
     const { data } = await modal.onWillDismiss();
@@ -188,6 +169,10 @@ export class VentasPage implements OnInit {
     this.carrito = this.carrito.filter((i) => i.varianteId !== item.varianteId);
   }
 
+  vaciarCarrito() {
+    this.carrito = [];
+  }
+
   async cobrar() {
     if (this.carrito.length === 0) {
       return;
@@ -196,6 +181,7 @@ export class VentasPage implements OnInit {
     const modal = await this.modalCtrl.create({
       component: PagoModal,
       componentProps: { subtotal: this.subtotal },
+      cssClass: ['sl-dialog-modal', 'sl-dialog-modal--cobro'],
     });
     await modal.present();
     const { data } = await modal.onWillDismiss();
@@ -220,7 +206,11 @@ export class VentasPage implements OnInit {
         this.procesando.set(false);
         this.carrito = [];
         this.cargar();
-        const modal = await this.modalCtrl.create({ component: ComprobanteModal, componentProps: { venta } });
+        const modal = await this.modalCtrl.create({
+          component: ComprobanteModal,
+          componentProps: { venta },
+          cssClass: ['sl-dialog-modal', 'sl-dialog-modal--comprobante'],
+        });
         await modal.present();
       },
       error: (err) => {
@@ -228,10 +218,6 @@ export class VentasPage implements OnInit {
         this.mostrarToast(err.error?.detail ?? 'No se pudo registrar la venta', 'danger');
       },
     });
-  }
-
-  logout() {
-    this.auth.logout();
   }
 
   private async mostrarToast(mensaje: string, color: 'success' | 'warning' | 'danger' = 'success') {

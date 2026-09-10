@@ -1,0 +1,349 @@
+/* Design tokens del sistema "Nocturne" (rediseño de UI, ver
+   design_handoff_stocklocal/README.md). Fondo oscuro, acento blurple
+   usado como línea/glow, nunca como relleno grande. Se van sumando acá
+   a medida que se rediseña cada pantalla — por ahora sólo lo que usa
+   Login. */
+
+:root {
+  --sl-bg: #161826;
+  --sl-sidebar: #13151f;
+  --sl-surface: #232532;
+  --sl-table-card: #1a1c29;
+  --sl-cart-panel: #191b28;
+
+  --sl-text: #e9e9ed;
+  --sl-text-muted: rgba(233, 233, 237, 0.6);
+  --sl-text-faint: rgba(233, 233, 237, 0.45);
+
+  --sl-accent: #9184d9;
+  --sl-accent-300: #d2cefd;
+  --sl-accent-400: #b5abfc;
+
+  --sl-neutral-1: #2c2f3d;
+  --sl-neutral-2: #3f424d;
+  --sl-neutral-3: #4a4d5e;
+  --sl-neutral-4: #595d6c;
+
+  --sl-divider: rgba(233, 233, 237, 0.16);
+  --sl-divider-section: rgba(233, 233, 237, 0.08);
+
+  --sl-radius-sm: 6px;
+  --sl-radius-md: 8px;
+  --sl-radius-lg: 14px;
+
+  --sl-shadow-sm: 0 0 0 1px var(--sl-neutral-2);
+  --sl-shadow-lg: 0 0 0 1px #9397ab, 0 16px 40px rgba(0, 0, 0, 0.65);
+
+  --sl-space-1: 2.8px;
+  --sl-space-2: 5.6px;
+  --sl-space-3: 8.4px;
+  --sl-space-4: 11.2px;
+  --sl-space-6: 16.8px;
+  --sl-space-8: 22.4px;
+
+  --sl-font: 'Inter', system-ui, sans-serif;
+}
+
+/* — botones — */
+.sl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: var(--sl-font);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--sl-text);
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 8px 10px;
+  border-radius: var(--sl-radius-md);
+}
+.sl-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.sl-btn-primary {
+  color: var(--sl-accent);
+  border-color: var(--sl-accent);
+}
+.sl-btn-primary:hover:not(:disabled) {
+  background: rgba(145, 132, 217, 0.12);
+}
+.sl-btn-primary:active:not(:disabled) {
+  background: rgba(145, 132, 217, 0.22);
+}
+.sl-btn-block {
+  width: 100%;
+}
+.sl-btn-secondary {
+  border-color: var(--sl-divider);
+}
+.sl-btn-secondary:hover:not(:disabled) {
+  background: rgba(233, 233, 237, 0.07);
+}
+.sl-btn-secondary:active:not(:disabled) {
+  background: rgba(233, 233, 237, 0.14);
+}
+.sl-btn-ghost {
+  color: var(--sl-accent);
+  padding-inline: var(--sl-space-1);
+}
+.sl-btn-ghost:hover:not(:disabled) {
+  background: rgba(145, 132, 217, 0.1);
+}
+.sl-btn-icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+}
+
+/* — formularios — */
+.sl-field > label {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 5px;
+  color: rgba(233, 233, 237, 0.7);
+}
+.sl-input {
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--sl-text);
+  caret-color: var(--sl-accent);
+  background: var(--sl-surface);
+  border: 1px solid var(--sl-divider);
+  border-radius: var(--sl-radius-md);
+}
+.sl-input:hover {
+  border-color: rgba(233, 233, 237, 0.45);
+}
+.sl-input:focus-visible {
+  outline: 2px solid var(--sl-accent);
+  outline-offset: 0;
+  border-color: var(--sl-accent);
+}
+
+.sl-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.sl-field-hint {
+  font-size: 11px;
+  color: rgba(233, 233, 237, 0.4);
+  margin-top: 4px;
+}
+.sl-form-error {
+  font-size: 12.5px;
+  color: #ef6a6a;
+}
+select.sl-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e9e9ed' stroke-opacity='.45' stroke-width='1.4' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 26px;
+}
+
+/* — segmented control — */
+.sl-seg {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid var(--sl-divider);
+  border-radius: var(--sl-radius-md);
+}
+.sl-seg-opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  border-left: 1px solid var(--sl-divider);
+  color: rgba(233, 233, 237, 0.6);
+  font-family: var(--sl-font);
+}
+.sl-seg-opt:first-child {
+  border-left: 0;
+}
+.sl-seg-opt.active {
+  color: var(--sl-accent);
+  box-shadow: inset 0 0 0 1px var(--sl-accent);
+}
+.sl-seg-opt:not(.active):hover {
+  background: rgba(233, 233, 237, 0.07);
+}
+
+/* — tags — */
+.sl-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  padding: 3px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.sl-tag-neutral {
+  background: var(--sl-neutral-1);
+  color: rgba(233, 233, 237, 0.7);
+}
+
+/* — cards — */
+.sl-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-space-2);
+  padding: var(--sl-space-3);
+  border-radius: var(--sl-radius-md);
+  background: var(--sl-surface);
+}
+.sl-card-kicker {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sl-accent);
+}
+.sl-elev-sm {
+  box-shadow: var(--sl-shadow-sm);
+}
+
+/* — tablas — */
+.sl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.sl-table th {
+  text-align: left;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(233, 233, 237, 0.6);
+  padding: var(--sl-space-2);
+}
+.sl-table td {
+  padding: var(--sl-space-2);
+}
+.sl-table thead tr {
+  background: linear-gradient(to right, transparent, var(--sl-divider-section) 48px, var(--sl-divider-section) calc(100% - 48px), transparent)
+    no-repeat bottom / 100% 1px;
+}
+.sl-table tbody tr {
+  background: linear-gradient(
+      to right,
+      transparent,
+      rgba(233, 233, 237, 0.08) 48px,
+      rgba(233, 233, 237, 0.08) calc(100% - 48px),
+      transparent
+    )
+    no-repeat bottom / 100% 1px;
+}
+.sl-table tbody tr:hover {
+  background:
+    linear-gradient(rgba(233, 233, 237, 0.04), rgba(233, 233, 237, 0.04)) no-repeat 0 0 / 100% 100%,
+    linear-gradient(
+        to right,
+        transparent,
+        rgba(233, 233, 237, 0.08) 48px,
+        rgba(233, 233, 237, 0.08) calc(100% - 48px),
+        transparent
+      )
+      no-repeat bottom / 100% 1px;
+}
+
+/* — dialogs (contenido interno de ion-modal, ver .sl-dialog-modal* más abajo) — */
+.sl-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-space-3);
+  padding: 18px;
+}
+.sl-dialog-title {
+  font-family: var(--sl-font);
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--sl-text);
+}
+.sl-dialog-body {
+  font-size: 14px;
+  color: var(--sl-text);
+  opacity: 0.85;
+}
+.sl-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sl-space-2);
+  margin-top: var(--sl-space-2);
+}
+
+/* ion-modal estilizado como diálogo Nocturne: centrado, surface oscuro,
+   radios/sombra del design system en vez del look nativo de Ionic. Se
+   aplica pasando cssClass al modalCtrl.create() de cada modal. */
+ion-modal.sl-dialog-modal {
+  --border-radius: var(--sl-radius-lg);
+  --background: var(--sl-surface);
+  --box-shadow: var(--sl-shadow-lg);
+  --backdrop-opacity: 0.5;
+}
+ion-modal.sl-dialog-modal::part(content) {
+  color: var(--sl-text);
+  font-family: var(--sl-font);
+}
+ion-modal.sl-dialog-modal--variante {
+  --width: min(420px, 92vw);
+  --height: auto;
+  --max-height: 86vh;
+}
+ion-modal.sl-dialog-modal--cobro {
+  --width: min(460px, 92vw);
+  --height: auto;
+  --max-height: 86vh;
+}
+ion-modal.sl-dialog-modal--comprobante {
+  --width: min(380px, 92vw);
+  --height: auto;
+}
+ion-modal.sl-dialog-modal--producto {
+  --width: min(460px, 92vw);
+  --height: auto;
+  --max-height: 90vh;
+}
+ion-modal.sl-dialog-modal--categoria {
+  --width: min(400px, 92vw);
+  --height: auto;
+  --max-height: 90vh;
+}
+ion-modal.sl-dialog-modal--proveedor {
+  --width: min(440px, 92vw);
+  --height: auto;
+  --max-height: 90vh;
+}
+ion-modal.sl-dialog-modal--confirm {
+  --width: min(380px, 92vw);
+  --height: auto;
+}
+ion-modal.sl-dialog-modal--variantes {
+  --width: min(560px, 94vw);
+  --height: auto;
+  --max-height: 90vh;
+}
+ion-modal.sl-dialog-modal--gasto {
+  --width: min(460px, 92vw);
+  --height: auto;
+  --max-height: 90vh;
+}
+ion-modal.sl-dialog-modal--categorias-gasto {
+  --width: min(520px, 94vw);
+  --height: auto;
+  --max-height: 88vh;
+}

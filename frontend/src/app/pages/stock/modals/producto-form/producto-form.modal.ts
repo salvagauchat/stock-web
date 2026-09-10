@@ -1,21 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonInput,
-  IonItem,
-  IonLabel,
-  IonSelect,
-  IonSelectOption,
-  IonText,
-  IonTitle,
-  IonToolbar,
-  ModalController,
-} from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular/standalone';
 import { CategoriaService } from '../../../../core/services/categoria.service';
 import { ProductoService } from '../../../../core/services/producto.service';
 import { ProveedorService } from '../../../../core/services/proveedor.service';
@@ -26,21 +12,7 @@ import { Proveedor } from '../../../../models/proveedor.model';
 @Component({
   selector: 'app-producto-form',
   standalone: true,
-  imports: [
-    FormsModule,
-    IonButton,
-    IonButtons,
-    IonContent,
-    IonHeader,
-    IonInput,
-    IonItem,
-    IonLabel,
-    IonSelect,
-    IonSelectOption,
-    IonText,
-    IonTitle,
-    IonToolbar,
-  ],
+  imports: [FormsModule],
   templateUrl: './producto-form.modal.html',
 })
 export class ProductoFormModal implements OnInit {
