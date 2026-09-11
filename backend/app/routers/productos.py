@@ -8,7 +8,6 @@ from app.schemas.producto import (
     AjustarStockRequest,
     ProductoCreate,
     ProductoDetalle,
-    ProductoOut,
     ProductoUpdate,
     VarianteCreate,
     VarianteOut,
@@ -18,7 +17,7 @@ from app.schemas.producto import (
 router = APIRouter(prefix="/productos", tags=["productos"], dependencies=[Depends(get_current_user)])
 
 
-@router.get("", response_model=list[ProductoOut])
+@router.get("", response_model=list[ProductoDetalle])
 async def listar(activos: bool = True, db: AsyncSession = Depends(get_db)):
     return await crud.listar(db, solo_activos=activos)
 

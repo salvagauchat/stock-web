@@ -1,27 +1,30 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
-import {
-  IonBackButton,
-  IonBadge,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonTitle,
-  IonToolbar,
-  ModalController,
-} from '@ionic/angular/standalone';
+import { RouterLink } from '@angular/router';
+import { ModalController } from '@ionic/angular/standalone';
 import { VentaService } from '../../core/services/venta.service';
-import { Venta } from '../../models/venta.model';
+import { EstadoVenta, Venta } from '../../models/venta.model';
+import { MoneyPipe } from '../../shared/pipes/money.pipe';
 import { DetalleVentaModal } from './modals/detalle-venta/detalle-venta.modal';
+
+const ETIQUETA_ESTADO: Record<EstadoVenta, string> = {
+  COMPLETADA: 'Completada',
+  ANULADA: 'Anulada',
+  PARCIAL_DEVUELTA: 'Devuelta parcial',
+};
+
+const CLASE_ESTADO: Record<EstadoVenta, string> = {
+  COMPLETADA: 'completada',
+  ANULADA: 'anulada',
+  PARCIAL_DEVUELTA: 'parcial',
+};
 
 @Component({
   selector: 'app-historial',
   standalone: true,
-  imports: [DatePipe, IonBackButton, IonBadge, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonTitle, IonToolbar],
+  imports: [DatePipe, NgClass, RouterLink, MoneyPipe],
   templateUrl: './historial.page.html',
+  styleUrl: './historial.page.scss',
 })
 export class HistorialPage implements OnInit {
   ventas: Venta[] = [];
@@ -47,14 +50,20 @@ export class HistorialPage implements OnInit {
     });
   }
 
-  colorEstado(estado: string): string {
-    if (estado === 'ANULADA') return 'danger';
-    if (estado === 'PARCIAL_DEVUELTA') return 'warning';
-    return 'success';
+  etiquetaEstado(estado: EstadoVenta): string {
+    return ETIQUETA_ESTADO[estado];
+  }
+
+  claseEstado(estado: EstadoVenta): string {
+    return CLASE_ESTADO[estado];
   }
 
   async abrirDetalle(venta: Venta) {
-    const modal = await this.modalCtrl.create({ component: DetalleVentaModal, componentProps: { ventaId: venta.id } });
+    const modal = await this.modalCtrl.create({
+      component: DetalleVentaModal,
+      componentProps: { ventaId: venta.id },
+      cssClass: ['sl-dialog-modal', 'sl-dialog-modal--detalle-venta'],
+    });
     await modal.present();
     const { data } = await modal.onWillDismiss();
     if (data?.huboCambios) {

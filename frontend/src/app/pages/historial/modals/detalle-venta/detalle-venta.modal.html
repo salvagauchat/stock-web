@@ -1,45 +1,73 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Venta #{{ ventaId }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="cerrar()">Cerrar</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<div class="sl-dialog-content detalle-venta-dialog">
+  <div class="dialog-header">
+    <div class="sl-dialog-title">Venta #{{ ventaId }}</div>
+    <button class="sl-btn sl-btn-secondary" type="button" (click)="cerrar()">Cerrar</button>
+  </div>
 
-<ion-content class="ion-padding">
   @if (venta) {
-    <p>{{ venta.fecha | date: 'dd/MM/yyyy HH:mm' }} · Estado: {{ venta.estado }}</p>
-
-    <ion-list>
-      @for (d of venta.detalles; track d.id) {
-        <ion-item>
-          <ion-label>{{ d.cantidad }} x {{ d.producto_nombre }}{{ etiquetaVariante(d) }}</ion-label>
-          <ion-label slot="end">${{ d.subtotal }}</ion-label>
-        </ion-item>
+    <div class="venta-meta">
+      <span>{{ venta.fecha | date: 'dd/MM/yyyy HH:mm' }}</span>
+      @if (venta.cliente) {
+        <span>· {{ venta.cliente }}</span>
       }
-    </ion-list>
+      <span class="sl-tag" [ngClass]="claseEstado(venta.estado)">{{ etiquetaEstado(venta.estado) }}</span>
+    </div>
 
-    <h2 class="ion-margin-top">Subtotal: ${{ venta.subtotal }}</h2>
-    <h2>Descuento: ${{ venta.descuento }}</h2>
-    <h1>Total: ${{ venta.total }}</h1>
+    <div class="venta-seccion">
+      <div class="venta-seccion-titulo">Productos</div>
+      <div class="venta-items">
+        @for (d of venta.detalles; track d.id) {
+          <div class="venta-item">
+            <div class="venta-item-info">
+              <div class="venta-item-nombre">{{ d.producto_nombre }}</div>
+              <div class="venta-item-meta">{{ etiquetaVariante(d) }} · {{ d.cantidad }} x {{ d.precio_unitario | money }}</div>
+            </div>
+            <div class="venta-item-monto">{{ d.subtotal | money }}</div>
+          </div>
+        }
+      </div>
+    </div>
 
-    <h3 class="ion-margin-top">Pagos</h3>
-    <ion-list>
-      @for (p of venta.pagos; track p.id) {
-        <ion-item>
-          <ion-label>{{ p.medio_pago }}</ion-label>
-          <ion-label slot="end">${{ p.monto }}</ion-label>
-        </ion-item>
-      }
-    </ion-list>
+    <div class="venta-totales">
+      <div class="venta-totales-row">
+        <span>Subtotal</span>
+        <span>{{ venta.subtotal | money }}</span>
+      </div>
+      <div class="venta-totales-row">
+        <span>Descuento</span>
+        <span>{{ venta.descuento | money }}</span>
+      </div>
+      <div class="venta-totales-row venta-totales-final">
+        <span>Total</span>
+        <span>{{ venta.total | money }}</span>
+      </div>
+    </div>
+
+    <div class="venta-seccion">
+      <div class="venta-seccion-titulo">Pagos</div>
+      <div class="venta-items">
+        @for (p of venta.pagos; track p.id) {
+          <div class="venta-item">
+            <div class="venta-item-info">
+              <div class="venta-item-nombre">{{ medioLabel(p.medio_pago) }}</div>
+              @if (p.cuotas) {
+                <div class="venta-item-meta">{{ p.cuotas }} cuotas</div>
+              }
+            </div>
+            <div class="venta-item-monto">{{ p.monto | money }}</div>
+          </div>
+        }
+      </div>
+    </div>
 
     @if (venta.notas) {
-      <p><strong>Notas:</strong> {{ venta.notas }}</p>
+      <p class="venta-notas"><strong>Notas:</strong> {{ venta.notas }}</p>
     }
 
     @if (venta.estado === 'COMPLETADA') {
-      <ion-button expand="block" color="danger" class="ion-margin-top" (click)="anular()">Anular venta</ion-button>
+      <div class="sl-dialog-actions">
+        <button class="sl-btn venta-anular-btn" type="button" (click)="anular()">Anular venta</button>
+      </div>
     }
   }
-</ion-content>
+</div>

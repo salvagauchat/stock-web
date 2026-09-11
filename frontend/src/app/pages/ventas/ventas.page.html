@@ -44,7 +44,7 @@
       </div>
 
       <div class="producto-list">
-        @for (producto of productosFiltrados; track producto.id) {
+        @for (producto of productosVisibles; track producto.id) {
           <button class="producto-row" type="button" (click)="seleccionarProducto(producto)">
             <div class="producto-thumb" [style.background]="colorCategoria(producto.categoria_id)">
               {{ inicial(producto.nombre) }}
@@ -63,15 +63,37 @@
           <div class="producto-list-empty">No hay productos con stock disponible.</div>
         }
       </div>
+
+      @if (productosFiltrados.length > productosVisibles.length) {
+        <div class="mostrar-mas-row">
+          <button class="sl-btn sl-btn-secondary" type="button" (click)="mostrarMas()">
+            Mostrar más ({{ productosFiltrados.length - productosVisibles.length }} restantes)
+          </button>
+        </div>
+      }
     </section>
 
-    <aside class="carrito-panel">
+    @if (!carritoAbierto()) {
+      <button class="carrito-tab" type="button" (click)="abrirCarrito()" aria-label="Abrir carrito">
+        <i class="ph ph-shopping-cart"></i>
+        @if (carrito.length > 0) {
+          <span class="carrito-tab-badge">{{ totalUnidades() }}</span>
+        }
+      </button>
+    }
+
+    <aside class="carrito-panel" [class.abierto]="carritoAbierto()">
       <div class="carrito-header">
         <i class="ph ph-shopping-cart"></i>
         <span>Carrito</span>
-        @if (carrito.length > 0) {
-          <button class="sl-btn sl-btn-ghost carrito-vaciar" type="button" (click)="vaciarCarrito()">Vaciar</button>
-        }
+        <div class="carrito-header-actions">
+          @if (carrito.length > 0) {
+            <button class="sl-btn sl-btn-ghost carrito-vaciar" type="button" (click)="vaciarCarrito()">Vaciar</button>
+          }
+          <button class="sl-btn sl-btn-ghost carrito-cerrar" type="button" (click)="cerrarCarrito()" aria-label="Cerrar carrito">
+            <i class="ph ph-x"></i>
+          </button>
+        </div>
       </div>
 
       <div class="carrito-items">

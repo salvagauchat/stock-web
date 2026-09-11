@@ -12,6 +12,10 @@
     </div>
   </header>
 
+  @if (cargando()) {
+    <div class="sl-loading-bar"><span class="sl-loading-bar-fill"></span></div>
+  }
+
   <div class="stock-body">
     <div class="filtros-row">
       <div class="search-input">
@@ -32,6 +36,10 @@
       <button class="sl-btn sl-btn-secondary" type="button" [class.active]="soloStockBajo" (click)="toggleStockBajo()">
         <i class="ph ph-warning"></i>
         Sólo stock bajo
+      </button>
+      <button class="sl-btn sl-btn-secondary" type="button" [class.active]="soloConStock" (click)="toggleConStock()">
+        <i class="ph ph-package"></i>
+        Sólo con stock
       </button>
     </div>
 
@@ -69,7 +77,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (producto of productosFiltrados; track producto.id) {
+          @for (producto of productosVisibles; track producto.id) {
             <tr>
               <td class="col-producto">
                 <div class="producto-cell">
@@ -124,6 +132,15 @@
         </tbody>
       </table>
     </div>
+
+    @if (productosFiltrados.length > productosVisibles.length) {
+      <div class="mostrar-mas-row">
+        <button class="sl-btn sl-btn-secondary" type="button" (click)="mostrarMas()">
+          Mostrar más ({{ productosFiltrados.length - productosVisibles.length }} restantes)
+        </button>
+      </div>
+    }
+
     <p class="tabla-nota">
       El stock sólo se mueve por movimiento_stock — las variantes se editan desde el gestor de variantes de cada producto.
     </p>

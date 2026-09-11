@@ -1,0 +1,116 @@
+.detalle-venta-dialog {
+  max-height: 82vh;
+  overflow-y: auto;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.venta-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: rgba(233, 233, 237, 0.55);
+  margin-top: -6px;
+}
+
+.sl-tag.completada {
+  background: rgba(111, 209, 150, 0.14);
+  color: #6fd196;
+}
+
+.sl-tag.anulada {
+  background: rgba(239, 106, 106, 0.14);
+  color: #ef6a6a;
+}
+
+.sl-tag.parcial {
+  background: rgba(224, 179, 92, 0.14);
+  color: #e0b35c;
+}
+
+.venta-seccion {
+  margin-top: 4px;
+}
+
+.venta-seccion-titulo {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(233, 233, 237, 0.45);
+  margin-bottom: 4px;
+}
+
+.venta-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(233, 233, 237, 0.07);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.venta-item-nombre {
+  font-size: 13.5px;
+}
+
+.venta-item-meta {
+  font-size: 11.5px;
+  color: rgba(233, 233, 237, 0.45);
+}
+
+.venta-item-monto {
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.venta-totales {
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--sl-divider-section);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.venta-totales-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: rgba(233, 233, 237, 0.65);
+}
+
+.venta-totales-final {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--sl-text);
+}
+
+.venta-notas {
+  font-size: 12.5px;
+  color: rgba(233, 233, 237, 0.6);
+  margin: 0;
+}
+
+.venta-anular-btn {
+  color: #ef6a6a;
+  border-color: #ef6a6a;
+}
+
+.venta-anular-btn:hover {
+  background: rgba(239, 106, 106, 0.12);
+}
+
+.venta-anular-btn:active {
+  background: rgba(239, 106, 106, 0.22);
+}

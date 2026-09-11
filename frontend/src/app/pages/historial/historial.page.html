@@ -1,27 +1,46 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/ventas"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Historial de ventas</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="page">
+  <header class="page-header">
+    <button class="sl-btn sl-btn-secondary sl-btn-icon" type="button" routerLink="/ventas" aria-label="Volver a Ventas">
+      <i class="ph ph-arrow-left"></i>
+    </button>
+    <div class="page-header-titles">
+      <h1>Historial de ventas</h1>
+      <p>{{ ventas.length }} ventas registradas</p>
+    </div>
+  </header>
 
-<ion-content>
-  <ion-list>
-    @for (venta of ventas; track venta.id) {
-      <ion-item button (click)="abrirDetalle(venta)">
-        <ion-label>
-          <h2>Venta #{{ venta.id }}</h2>
-          <p>{{ venta.fecha | date: 'dd/MM/yyyy HH:mm' }} @if (venta.cliente) { · {{ venta.cliente }} }</p>
-        </ion-label>
-        <ion-badge slot="end" [color]="colorEstado(venta.estado)">{{ venta.estado }}</ion-badge>
-        <ion-label slot="end">${{ venta.total }}</ion-label>
-      </ion-item>
-    } @empty {
-      <ion-item>
-        <ion-label>Todavía no hay ventas registradas.</ion-label>
-      </ion-item>
-    }
-  </ion-list>
-</ion-content>
+  <div class="historial-body">
+    <div class="tabla-wrap">
+      <table class="sl-table">
+        <thead>
+          <tr>
+            <th class="col-venta">Venta</th>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Estado</th>
+            <th class="col-num">Total</th>
+            <th class="col-acciones"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (venta of ventas; track venta.id) {
+            <tr class="fila-venta" (click)="abrirDetalle(venta)">
+              <td class="col-venta">#{{ venta.id }}</td>
+              <td class="col-fecha">{{ venta.fecha | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td class="col-cliente">{{ venta.cliente || '—' }}</td>
+              <td>
+                <span class="sl-tag" [ngClass]="claseEstado(venta.estado)">{{ etiquetaEstado(venta.estado) }}</span>
+              </td>
+              <td class="col-num">{{ venta.total | money }}</td>
+              <td class="col-acciones"><i class="ph ph-caret-right"></i></td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="tabla-vacia">Todavía no hay ventas registradas.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

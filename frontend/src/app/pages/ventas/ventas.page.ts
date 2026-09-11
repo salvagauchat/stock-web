@@ -25,6 +25,8 @@ interface ItemCarrito {
   stockDisponible: number;
 }
 
+const TAMANO_PAGINA = 30;
+
 @Component({
   selector: 'app-ventas',
   standalone: true,
@@ -41,6 +43,8 @@ export class VentasPage implements OnInit {
   carrito: ItemCarrito[] = [];
   cargando = signal(false);
   procesando = signal(false);
+  carritoAbierto = signal(false);
+  limite = signal(TAMANO_PAGINA);
 
   constructor(
     private productoSvc: ProductoService,
@@ -77,6 +81,15 @@ export class VentasPage implements OnInit {
       const matchCategoria = categoriaId === null || p.categoria_id === categoriaId;
       return matchTexto && matchCategoria;
     });
+    this.limite.set(TAMANO_PAGINA);
+  }
+
+  get productosVisibles(): Producto[] {
+    return this.productosFiltrados.slice(0, this.limite());
+  }
+
+  mostrarMas() {
+    this.limite.update((l) => l + TAMANO_PAGINA);
   }
 
   seleccionarCategoria(id: number | null) {
@@ -93,6 +106,18 @@ export class VentasPage implements OnInit {
 
   get subtotal(): number {
     return this.carrito.reduce((acc, item) => acc + item.cantidad * item.precioUnitario, 0);
+  }
+
+  totalUnidades(): number {
+    return this.carrito.reduce((acc, item) => acc + item.cantidad, 0);
+  }
+
+  abrirCarrito() {
+    this.carritoAbierto.set(true);
+  }
+
+  cerrarCarrito() {
+    this.carritoAbierto.set(false);
   }
 
   readonly etiqueta = etiquetaVariante;
@@ -136,6 +161,7 @@ export class VentasPage implements OnInit {
         return;
       }
       existente.cantidad++;
+      this.carritoAbierto.set(true);
       return;
     }
 
@@ -148,6 +174,7 @@ export class VentasPage implements OnInit {
       precioUnitario,
       stockDisponible: variante.stock_actual,
     });
+    this.carritoAbierto.set(true);
   }
 
   incrementar(item: ItemCarrito) {
@@ -171,6 +198,7 @@ export class VentasPage implements OnInit {
 
   vaciarCarrito() {
     this.carrito = [];
+    this.carritoAbierto.set(false);
   }
 
   async cobrar() {
@@ -205,6 +233,7 @@ export class VentasPage implements OnInit {
       next: async (venta) => {
         this.procesando.set(false);
         this.carrito = [];
+        this.carritoAbierto.set(false);
         this.cargar();
         const modal = await this.modalCtrl.create({
           component: ComprobanteModal,

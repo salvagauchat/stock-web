@@ -1,16 +1,18 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { firstValueFrom, forkJoin } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { ModalController, ToastController } from '@ionic/angular/standalone';
 import { CategoriaService } from '../../core/services/categoria.service';
 import { ProductoService } from '../../core/services/producto.service';
 import { Categoria } from '../../models/categoria.model';
-import { Producto, ProductoDetalle } from '../../models/producto.model';
+import { ProductoDetalle } from '../../models/producto.model';
 import { ConfirmDialogModal } from '../../shared/modals/confirm-dialog/confirm-dialog.modal';
 import { colorCategoria, etiquetaVariante, inicial } from '../../shared/presentacion';
 import { MoneyPipe } from '../../shared/pipes/money.pipe';
 import { ProductoFormModal } from './modals/producto-form/producto-form.modal';
 import { VariantesManagerModal } from './modals/variantes-manager/variantes-manager.modal';
+
+const TAMANO_PAGINA = 30;
 
 @Component({
   selector: 'app-stock',
@@ -26,6 +28,8 @@ export class StockPage implements OnInit {
   busqueda = '';
   categoriaFiltro: number | null = null;
   soloStockBajo = false;
+  soloConStock = true;
+  limite = signal(TAMANO_PAGINA);
   cargando = signal(false);
 
   readonly colorCategoria = colorCategoria;
@@ -47,21 +51,8 @@ export class StockPage implements OnInit {
   cargar() {
     this.cargando.set(true);
     this.productoSvc.listar(true).subscribe({
-      next: (productos) => this.cargarDetalles(productos),
-      error: () => this.cargando.set(false),
-    });
-  }
-
-  private cargarDetalles(productos: Producto[]) {
-    if (productos.length === 0) {
-      this.productos = [];
-      this.aplicarFiltro();
-      this.cargando.set(false);
-      return;
-    }
-    forkJoin(productos.map((p) => this.productoSvc.obtener(p.id))).subscribe({
-      next: (detalles) => {
-        this.productos = detalles;
+      next: (productos) => {
+        this.productos = productos;
         this.aplicarFiltro();
         this.cargando.set(false);
       },
@@ -76,12 +67,27 @@ export class StockPage implements OnInit {
         !termino || p.id.toString() === termino || [p.nombre, p.marca].some((campo) => campo?.toLowerCase().includes(termino));
       const matchCategoria = this.categoriaFiltro === null || p.categoria_id === this.categoriaFiltro;
       const matchStockBajo = !this.soloStockBajo || this.productoTieneStockBajo(p);
-      return matchTexto && matchCategoria && matchStockBajo;
+      const matchConStock = !this.soloConStock || p.stock_total > 0;
+      return matchTexto && matchCategoria && matchStockBajo && matchConStock;
     });
+    this.limite.set(TAMANO_PAGINA);
+  }
+
+  get productosVisibles(): ProductoDetalle[] {
+    return this.productosFiltrados.slice(0, this.limite());
+  }
+
+  mostrarMas() {
+    this.limite.update((l) => l + TAMANO_PAGINA);
   }
 
   toggleStockBajo() {
     this.soloStockBajo = !this.soloStockBajo;
+    this.aplicarFiltro();
+  }
+
+  toggleConStock() {
+    this.soloConStock = !this.soloConStock;
     this.aplicarFiltro();
   }
 

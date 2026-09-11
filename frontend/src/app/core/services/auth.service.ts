@@ -35,6 +35,7 @@ export class AuthService {
       tap((res) => {
         localStorage.setItem(TOKEN_KEY, res.access_token);
         this.autenticadoSignal.set(true);
+        this.cargarUsuarioActual().subscribe();
       }),
     );
   }

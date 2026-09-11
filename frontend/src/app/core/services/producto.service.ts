@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
-  Producto,
   ProductoCreate,
   ProductoDetalle,
   ProductoUpdate,
@@ -18,8 +17,8 @@ export class ProductoService {
 
   constructor(private http: HttpClient) {}
 
-  listar(activos = true): Observable<Producto[]> {
-    return this.http.get<Producto[]>(this.baseUrl, { params: { activos } });
+  listar(activos = true): Observable<ProductoDetalle[]> {
+    return this.http.get<ProductoDetalle[]>(this.baseUrl, { params: { activos } });
   }
 
   obtener(id: number): Observable<ProductoDetalle> {

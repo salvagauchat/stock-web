@@ -26,26 +26,13 @@
 .sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 9px;
   padding: 4px 8px 18px;
 }
 
-.sidebar-brand-mark {
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
-  border: 1px solid var(--sl-accent);
-  display: grid;
-  place-items: center;
-  color: var(--sl-accent);
-  font-size: 15px;
-}
-
-.sidebar-brand-name {
-  font-size: 14.5px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: var(--sl-text);
+.sidebar-brand-logo {
+  height: 34px;
+  width: auto;
+  display: block;
 }
 
 .sidebar-group-label {
