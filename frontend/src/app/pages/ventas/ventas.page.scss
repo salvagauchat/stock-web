@@ -475,4 +475,11 @@
     width: auto;
     z-index: 5;
   }
+
+  /* el navegador del celular tapa el botón Cobrar con su propia barra
+     inferior (gestos/dirección) — dejamos margen extra respetando el
+     safe-area-inset del dispositivo */
+  .carrito-footer {
+    padding-bottom: max(24px, calc(env(safe-area-inset-bottom) + 18px));
+  }
 }
