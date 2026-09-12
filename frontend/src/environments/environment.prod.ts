@@ -1,5 +1,4 @@
 export const environment = {
   production: true,
-  // Reemplazar por la URL real del backend en Render una vez desplegado.
-  apiUrl: 'https://TU-BACKEND.onrender.com',
+  apiUrl: 'https://stock-web-bv88.onrender.com',
 };
