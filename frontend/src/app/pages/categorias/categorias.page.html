@@ -6,6 +6,10 @@
     </div>
   </header>
 
+  @if (cargando()) {
+    <div class="sl-loading-bar"><span class="sl-loading-bar-fill"></span></div>
+  }
+
   <div class="categorias-body">
     <div class="categorias-grid">
       @for (r of resumenes; track r.categoria.id) {

@@ -12,6 +12,10 @@
     </div>
   </header>
 
+  @if (cargando()) {
+    <div class="sl-loading-bar"><span class="sl-loading-bar-fill"></span></div>
+  }
+
   <div class="ventas-layout">
     <section class="productos-panel">
       <div class="search-row">

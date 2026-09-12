@@ -63,6 +63,10 @@
       <p class="form-error">{{ error() }}</p>
     }
 
+    @if (cargando()) {
+      <div class="sl-loading-bar login-loading-bar"><span class="sl-loading-bar-fill"></span></div>
+    }
+
     <button class="sl-btn sl-btn-primary sl-btn-block submit-btn" type="submit" [disabled]="cargando()">
       {{ cargando() ? 'Ingresando...' : 'Ingresar' }}
     </button>

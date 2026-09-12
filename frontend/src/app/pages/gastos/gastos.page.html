@@ -16,6 +16,10 @@
     </div>
   </header>
 
+  @if (cargando()) {
+    <div class="sl-loading-bar"><span class="sl-loading-bar-fill"></span></div>
+  }
+
   <div class="gastos-body">
     <div class="filtros-row">
       <div class="sl-seg">
