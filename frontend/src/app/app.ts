@@ -13,6 +13,7 @@ import { AuthService } from './core/services/auth.service';
 })
 export class App implements OnInit {
   private readonly urlActual = signal('');
+  sidebarAbierto = signal(false);
 
   readonly stockActivo = computed(() =>
     ['/stock', '/categorias', '/proveedores'].some((p) => this.urlActual().startsWith(p)),
@@ -37,6 +38,7 @@ export class App implements OnInit {
     this.urlActual.set(this.router.url);
     this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe((e) => {
       this.urlActual.set((e as NavigationEnd).urlAfterRedirects);
+      this.sidebarAbierto.set(false);
     });
   }
 
@@ -44,6 +46,14 @@ export class App implements OnInit {
     if (this.auth.autenticado()) {
       this.auth.cargarUsuarioActual().subscribe();
     }
+  }
+
+  toggleSidebar() {
+    this.sidebarAbierto.update((v) => !v);
+  }
+
+  cerrarSidebar() {
+    this.sidebarAbierto.set(false);
   }
 
   logout() {

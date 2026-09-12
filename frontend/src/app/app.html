@@ -1,7 +1,17 @@
 @if (auth.autenticado()) {
   <ion-app>
     <div class="shell">
-      <aside class="sidebar">
+      @if (!sidebarAbierto()) {
+        <button class="sidebar-toggle" type="button" (click)="toggleSidebar()" aria-label="Abrir menú">
+          <i class="ph ph-list"></i>
+        </button>
+      }
+
+      @if (sidebarAbierto()) {
+        <div class="sidebar-backdrop" (click)="cerrarSidebar()"></div>
+      }
+
+      <aside class="sidebar" [class.abierto]="sidebarAbierto()">
         <div class="sidebar-brand">
           <img class="sidebar-brand-logo" src="logo-mark.png" alt="GRES" />
         </div>

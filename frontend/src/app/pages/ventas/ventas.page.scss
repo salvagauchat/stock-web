@@ -16,6 +16,8 @@
   flex: none;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  row-gap: 10px;
   gap: 14px;
   padding: 16px 24px 14px;
   border-bottom: 1px solid var(--sl-divider-section);
@@ -39,7 +41,16 @@
   margin-left: auto;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
+}
+
+/* dejar lugar al botón hamburguesa fijo (arriba a la izquierda) que
+   aparece en mobile para abrir el menú lateral */
+@media (max-width: 880px) {
+  .page-header {
+    padding-top: 60px;
+  }
 }
 
 .page-header-actions .sl-btn {
@@ -426,4 +437,32 @@
 .cobrar-btn {
   height: 42px;
   font-size: 15px;
+}
+
+@media (max-width: 640px) {
+  .productos-panel {
+    padding: 14px 14px 20px;
+  }
+
+  .producto-row {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .producto-info {
+    min-width: 0;
+  }
+
+  .precio-costo {
+    display: none;
+  }
+
+  /* el carrito abierto pasa a ocupar toda la pantalla en vez de compartir
+     el ancho con la lista de productos, que quedaría ilegible */
+  .carrito-panel.abierto {
+    position: absolute;
+    inset: 0;
+    width: auto;
+    z-index: 5;
+  }
 }

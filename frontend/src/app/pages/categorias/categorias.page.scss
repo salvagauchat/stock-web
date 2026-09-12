@@ -16,6 +16,8 @@
   flex: none;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  row-gap: 10px;
   gap: 14px;
   padding: 16px 24px 14px;
   border-bottom: 1px solid var(--sl-divider-section);
@@ -33,6 +35,14 @@
   font-size: 12px;
   color: rgba(233, 233, 237, 0.48);
   margin: 2px 0 0;
+}
+
+/* dejar lugar al botón hamburguesa fijo (arriba a la izquierda) que
+   aparece en mobile para abrir el menú lateral */
+@media (max-width: 880px) {
+  .page-header {
+    padding-top: 60px;
+  }
 }
 
 .categorias-body {

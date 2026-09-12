@@ -206,6 +206,7 @@ select.sl-input {
   padding: var(--sl-space-3);
   border-radius: var(--sl-radius-md);
   background: var(--sl-surface);
+  min-width: 0;
 }
 .sl-card-kicker {
   font-size: 10px;
