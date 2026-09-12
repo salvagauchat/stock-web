@@ -437,6 +437,16 @@
 .cobrar-btn {
   height: 42px;
   font-size: 15px;
+  color: #84d989;
+  border-color: #84d989;
+}
+
+.cobrar-btn:hover:not(:disabled) {
+  background: rgba(132, 217, 137, 0.12);
+}
+
+.cobrar-btn:active:not(:disabled) {
+  background: rgba(132, 217, 137, 0.22);
 }
 
 @media (max-width: 640px) {
