@@ -20,7 +20,7 @@ El usuario es Salvador, habla español argentino. **Respondé siempre en españo
 - Alembic para migraciones (nunca se toca el schema a mano, todo vía `alembic revision`)
 - Pydantic v2 para los schemas de entrada/salida
 - Auth: JWT (`python-jose`) + hash de contraseña (`passlib[bcrypt]`)
-- Base de datos: **Postgres** en producción (pensado para Neon, aún no desplegado), **SQLite** (`sqlite+aiosqlite`) en desarrollo local por defecto — configurable vía `DATABASE_URL` en `.env`, el código es agnóstico del motor
+- Base de datos: **Postgres/Neon** en producción (ya desplegado), **SQLite** (`sqlite+aiosqlite`) en desarrollo local por defecto — configurable vía `DATABASE_URL` en `.env`, el código es agnóstico del motor
 
 **Frontend** (`frontend/`):
 - Angular 20 (standalone components, sin NgModules)
@@ -127,7 +127,7 @@ ng build          # build de producción, usa environment.prod.ts vía fileRepla
 
 Módulos completos y verificados end-to-end (backend probado con `curl`, frontend probado en el navegador): **login** (con rate limit), **stock** (productos + variantes talle/color + categorías + proveedores), **ventas** (carrito, cobro simple/mixto, historial, anulación), **gastos** (con categorías corriente/no-corriente), **balance** (dashboard con gráficos, top de categorías más vendidas, tabla por medio de pago). Navegación por sidebar. UI en el diseño "Nocturne" (ver sección de Diseño de UI más arriba) salvo Historial, todavía sin migrar.
 
-**Todavía no desplegado a producción** — corre todo local (backend en `localhost:8000`, Postgres real pendiente de Neon, frontend pendiente de Vercel).
+**Ya desplegado a producción**: backend en Render (`https://stock-web-bv88.onrender.com`, `backend/.python-version` fija Python 3.12 porque Render usa 3.14 por defecto y rompía `pydantic-core`) conectado a Postgres real en Neon, y frontend en Vercel (`environment.prod.ts` apunta al backend de Render). En desarrollo local se sigue usando `localhost:8000` + SQLite como antes.
 
 **Fuera de alcance por ahora** (no proponer sin que se pida): servicios en la venta (el modelo de `apk-stock` los soporta pero acá no hay módulo de Servicios), devoluciones parciales, reportes/exportación PDF/Excel, UI de configuración de medios de pago.
 
