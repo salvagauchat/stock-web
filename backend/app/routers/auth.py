@@ -29,7 +29,7 @@ async def login(datos: LoginRequest, db: AsyncSession = Depends(get_db)):
 
     if usuario is None or not usuario.activo or not verify_password(datos.password, usuario.password_hash):
         login_rate_limiter.registrar_fallo(email)
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Email o contraseña incorrectos")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales incorrectas")
 
     login_rate_limiter.registrar_exito(email)
     token = crear_access_token(usuario.id)
