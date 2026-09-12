@@ -217,7 +217,7 @@
     /* el navegador del celular tapa el botón de salir con su propia barra
        inferior (gestos/dirección) — dejamos margen extra respetando el
        safe-area-inset del dispositivo */
-    padding-bottom: max(28px, calc(env(safe-area-inset-bottom) + 20px));
+    padding-bottom: max(64px, calc(env(safe-area-inset-bottom) + 56px));
     transform: translateX(-100%);
     transition: transform 0.22s ease;
     box-shadow: var(--sl-shadow-lg);
