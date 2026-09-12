@@ -154,6 +154,14 @@
   }
 }
 
+.sidebar-footer {
+  padding: 10px 8px 2px;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: rgba(233, 233, 237, 0.28);
+  text-align: center;
+}
+
 .sidebar-toggle {
   display: none;
   position: fixed;
@@ -181,6 +189,10 @@
 @media (max-width: 880px) {
   .shell {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar-footer {
+    display: none;
   }
 
   .sidebar-toggle {

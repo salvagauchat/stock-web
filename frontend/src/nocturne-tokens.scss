@@ -380,3 +380,13 @@ ion-modal.sl-dialog-modal--detalle-venta {
     left: 100%;
   }
 }
+
+/* — mobile: cada página de Ionic (.ion-page) queda con position:absolute
+   inset:0 pegada al borde físico de la pantalla; sin este margen el
+   contenido termina tapado por la barra gestual/home indicator del
+   teléfono — */
+@media (max-width: 880px) {
+  .ion-page {
+    padding-bottom: max(14px, env(safe-area-inset-bottom, 0px));
+  }
+}
