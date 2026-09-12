@@ -7,15 +7,6 @@
   font-family: var(--sl-font);
 }
 
-@media (max-width: 760px) {
-  :host {
-    grid-template-columns: 1fr;
-  }
-  .marketing {
-    display: none;
-  }
-}
-
 .marketing {
   position: relative;
   overflow: hidden;
@@ -203,4 +194,48 @@
   font-size: 11.5px;
   color: rgba(233, 233, 237, 0.4);
   text-align: center;
+}
+
+/* mobile: la franja de marketing queda visible pero compacta, arriba del
+   formulario — antes tenía una regla que la escondía del todo pero un
+   .marketing{} más abajo en este mismo archivo la pisaba y nunca llegaba
+   a aplicarse */
+@media (max-width: 760px) {
+  :host {
+    grid-template-columns: 1fr;
+    align-content: start;
+  }
+
+  .marketing {
+    padding: 22px 24px 16px;
+    justify-content: flex-start;
+    gap: 14px;
+  }
+
+  .marketing-glow,
+  .marketing-rule {
+    display: none;
+  }
+
+  .brand-logo {
+    height: 28px;
+  }
+
+  .headline-mark {
+    display: none;
+  }
+
+  .headline h1 {
+    font-size: 21px;
+    margin: 0;
+  }
+
+  .headline p,
+  .stats {
+    display: none;
+  }
+
+  .form-side {
+    padding: 24px;
+  }
 }

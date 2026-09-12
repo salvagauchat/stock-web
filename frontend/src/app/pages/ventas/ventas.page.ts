@@ -120,6 +120,16 @@ export class VentasPage implements OnInit {
     this.carritoAbierto.set(false);
   }
 
+  /* En mobile el carrito abierto ocupa toda la pantalla (ver
+     ventas.page.scss), así que abrirlo solo al tocar el ícono, nunca
+     automático al agregar un producto — si no, tapa la lista y no se
+     puede seguir agregando más de uno sin cerrarlo primero. */
+  private abrirCarritoAlAgregar() {
+    if (window.innerWidth > 640) {
+      this.carritoAbierto.set(true);
+    }
+  }
+
   readonly etiqueta = etiquetaVariante;
 
   async seleccionarProducto(producto: Producto) {
@@ -161,7 +171,7 @@ export class VentasPage implements OnInit {
         return;
       }
       existente.cantidad++;
-      this.carritoAbierto.set(true);
+      this.abrirCarritoAlAgregar();
       return;
     }
 
@@ -174,7 +184,7 @@ export class VentasPage implements OnInit {
       precioUnitario,
       stockDisponible: variante.stock_actual,
     });
-    this.carritoAbierto.set(true);
+    this.abrirCarritoAlAgregar();
   }
 
   incrementar(item: ItemCarrito) {
